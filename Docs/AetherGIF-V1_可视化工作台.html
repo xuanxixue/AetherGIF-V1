@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AetherGIF-V1 可视化工作台 · 基于 PMNN 物理核的 GIF 条件生成</title>
+<style>
+:root{
+  --bg:#0a0e14; --bg2:#0f1620; --panel:#121b29; --panel2:#16233a;
+  --line:#1e2f47; --line2:#2a4266;
+  --txt:#c9d6e8; --txt-dim:#7a8ba8; --txt-hi:#eaf2ff;
+  --acc:#3da9fc; --acc2:#7c5cff; --ok:#2ee6a8; --warn:#ffb648; --bad:#ff5c7a; --arch:#ff9f43;
+  --mono:'JetBrains Mono','Cascadia Code',Consolas,'Courier New',monospace;
+  --sans:'PingFang SC','Microsoft YaHei','Segoe UI',system-ui,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--txt);font-family:var(--sans);font-size:14px;line-height:1.75;overflow-x:hidden}
+::selection{background:var(--acc);color:#04121f}
+a{color:var(--acc);text-decoration:none}
+code,.mono{font-family:var(--mono);font-size:.88em;color:#8fd0ff;background:#0d1522;padding:.08em .38em;border-radius:4px;border:1px solid var(--line)}
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--line2);border-radius:5px}
+
+/* ============ NAV ============ */
+nav{position:fixed;top:0;left:0;bottom:0;width:232px;background:var(--bg2);border-right:1px solid var(--line);padding:22px 0;z-index:200;overflow-y:auto}
+nav .brand{padding:0 22px 18px;border-bottom:1px solid var(--line)}
+nav .brand .t1{font-size:17px;font-weight:800;color:var(--txt-hi);letter-spacing:.5px}
+nav .brand .t2{font-size:11px;color:var(--txt-dim);font-family:var(--mono);margin-top:3px}
+nav ul{list-style:none;margin-top:12px}
+nav a{display:block;padding:7px 22px;color:var(--txt-dim);font-size:13px;border-left:3px solid transparent;transition:all .15s}
+nav a:hover{color:var(--txt-hi);background:var(--panel)}
+nav a.active{color:var(--acc);border-left-color:var(--acc);background:var(--panel)}
+nav a .n{font-family:var(--mono);font-size:10px;opacity:.6;margin-right:6px}
+main{margin-left:232px}
+section{padding:44px 56px 34px;border-bottom:1px solid var(--line)}
+h2{font-size:22px;color:var(--txt-hi);font-weight:800;margin-bottom:6px;display:flex;align-items:center;gap:10px}
+h2 .tag{font-size:11px;font-family:var(--mono);color:var(--acc);border:1px solid var(--line2);padding:2px 8px;border-radius:20px;background:var(--panel)}
+h2 .no{font-family:var(--mono);color:var(--acc2);font-size:15px}
+.sub{color:var(--txt-dim);font-size:13px;margin-bottom:22px}
+h3{font-size:15px;color:var(--txt-hi);margin:22px 0 10px;font-weight:700}
+h3::before{content:'';display:inline-block;width:4px;height:14px;background:var(--acc);margin-right:8px;vertical-align:-2px;border-radius:2px}
+
+/* ============ HERO ============ */
+.hero{background:linear-gradient(160deg,#0c1420 0%,#101d33 55%,#0c1420 100%);padding:52px 56px 40px;border-bottom:1px solid var(--line2)}
+.hero h1{font-size:30px;color:var(--txt-hi);font-weight:900;letter-spacing:.5px}
+.hero h1 span{background:linear-gradient(90deg,var(--acc),var(--acc2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero .desc{color:var(--txt-dim);margin-top:10px;max-width:900px}
+.hero .desc b{color:var(--warn)}
+.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:12px;margin-top:26px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:13px 15px;position:relative;overflow:hidden}
+.stat::after{content:'';position:absolute;top:0;left:0;width:100%;height:2px;background:var(--acc)}
+.stat.warn::after{background:var(--warn)} .stat.bad::after{background:var(--bad)} .stat.ok::after{background:var(--ok)} .stat.arch::after{background:var(--arch)}
+.stat .k{font-size:11px;color:var(--txt-dim)}
+.stat .v{font-size:21px;font-weight:800;color:var(--txt-hi);font-family:var(--mono);margin-top:2px}
+.stat .v small{font-size:11px;color:var(--txt-dim);font-weight:400}
+.pill{display:inline-block;font-size:10px;font-family:var(--mono);padding:1px 7px;border-radius:10px;margin-left:6px;vertical-align:2px}
+.pill.ok{background:rgba(46,230,168,.12);color:var(--ok);border:1px solid rgba(46,230,168,.35)}
+.pill.warn{background:rgba(255,182,72,.12);color:var(--warn);border:1px solid rgba(255,182,72,.35)}
+.pill.bad{background:rgba(255,92,122,.14);color:var(--bad);border:1px solid rgba(255,92,122,.4)}
+
+/* ============ GRID / CARDS ============ */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+.card h4{font-size:14px;color:var(--txt-hi);margin-bottom:8px;font-weight:700}
+.card.arch{border-color:rgba(255,159,67,.4)}
+.card.bad{border-color:rgba(255,92,122,.4)}
+.card.ok{border-color:rgba(46,230,168,.35)}
+.card.warn{border-color:rgba(255,182,72,.4)}
+.kv{display:flex;justify-content:space-between;font-size:12.5px;padding:3.5px 0;border-bottom:1px dashed rgba(30,47,71,.6)}
+.kv:last-child{border-bottom:none}
+.kv .k{color:var(--txt-dim)} .kv .v{font-family:var(--mono);color:var(--txt-hi)}
+.kv .v.hi{color:var(--ok)} .kv .v.lo{color:var(--bad)} .kv .v.mid{color:var(--warn)}
+
+/* ============ FLOW DIAGRAM ============ */
+.flow{display:flex;flex-direction:column;gap:0;align-items:center;padding:8px 0}
+.fnode{background:var(--panel2);border:1.5px solid var(--line2);border-radius:10px;padding:10px 20px;text-align:center;min-width:270px;position:relative}
+.fnode .ft{font-size:13.5px;font-weight:700;color:var(--txt-hi)}
+.fnode .fd{font-size:11px;color:var(--txt-dim);font-family:var(--mono);margin-top:2px}
+.fnode.io{border-color:var(--acc)} .fnode.core{border-color:var(--arch);box-shadow:0 0 22px rgba(255,159,67,.13)}
+.fnode.cond{border-color:var(--acc2)} .fnode.loss{border-color:var(--bad)}
+.farrow{width:2px;height:24px;background:linear-gradient(var(--line2),var(--acc));position:relative}
+.farrow::after{content:'';position:absolute;bottom:-1px;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--acc)}
+.farrow.short{height:14px}
+.flbl{font-size:10px;font-family:var(--mono);color:var(--txt-dim);position:absolute;left:12px;top:50%;transform:translateY(-50%);white-space:nowrap;background:var(--bg);padding:1px 6px;border-radius:4px;border:1px solid var(--line)}
+.farrow{position:relative}
+.frow{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;width:100%}
+.fcol{display:flex;flex-direction:column;align-items:center;gap:0;flex:1;min-width:0}
+.branch{border:1px dashed var(--line2);border-radius:12px;padding:14px;margin-top:10px;background:rgba(18,27,41,.5)}
+.branch .bt{font-size:11.5px;font-weight:700;color:var(--acc2);letter-spacing:1px;margin-bottom:10px;text-align:center}
+
+/* ============ TABLE ============ */
+table{width:100%;border-collapse:collapse;font-size:12.5px;background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+th{background:var(--panel2);color:var(--txt-hi);text-align:left;padding:8px 10px;font-size:11.5px;letter-spacing:.4px;border-bottom:1px solid var(--line2);white-space:nowrap}
+td{padding:7px 10px;border-bottom:1px solid rgba(30,47,71,.5);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(61,169,252,.045)}
+td.num,th.num{font-family:var(--mono);text-align:right;white-space:nowrap}
+.st{font-size:10.5px;font-family:var(--mono);padding:1.5px 8px;border-radius:10px;white-space:nowrap}
+.st.ok{background:rgba(46,230,168,.13);color:var(--ok)} .st.part{background:rgba(255,182,72,.13);color:var(--warn)}
+.st.no{background:rgba(255,92,122,.14);color:var(--bad)} .st.arch{background:rgba(255,159,67,.14);color:var(--arch)}
+.st.dim{background:rgba(122,139,168,.14);color:var(--txt-dim)}
+.filterbar{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.fbtn{background:var(--panel);border:1px solid var(--line2);color:var(--txt-dim);font-size:12px;padding:5px 14px;border-radius:16px;cursor:pointer;transition:all .15s;font-family:var(--sans)}
+.fbtn:hover{color:var(--txt-hi);border-color:var(--acc)}
+.fbtn.on{background:var(--acc);color:#04121f;border-color:var(--acc);font-weight:700}
+
+/* ============ TIMELINE ============ */
+.tl{position:relative;padding-left:26px}
+.tl::before{content:'';position:absolute;left:7px;top:8px;bottom:8px;width:2px;background:linear-gradient(var(--acc),var(--acc2),var(--arch))}
+.titem{position:relative;margin-bottom:13px;cursor:pointer}
+.titem::before{content:'';position:absolute;left:-24px;top:5px;width:11px;height:11px;border-radius:50%;background:var(--bg);border:2.5px solid var(--acc);transition:all .2s}
+.titem.warn::before{border-color:var(--warn)} .titem.bad::before{border-color:var(--bad)} .titem.ok::before{border-color:var(--ok)} .titem.dim::before{border-color:var(--txt-dim)}
+.titem:hover::before{transform:scale(1.35);box-shadow:0 0 10px currentColor}
+.titem .tt{font-size:13px;font-weight:700;color:var(--txt-hi)}
+.titem .tt .ver{font-family:var(--mono);color:var(--acc);margin-right:8px}
+.titem.warn .tt .ver{color:var(--warn)} .titem.bad .tt .ver{color:var(--bad)} .titem.ok .tt .ver{color:var(--ok)} .titem.dim .tt .ver{color:var(--txt-dim)}
+.titem .td{font-size:12px;color:var(--txt-dim);margin-top:1px}
+.tdetail{display:none;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin:6px 0 4px;font-size:12.5px}
+.titem.open .tdetail{display:block}
+
+/* ============ METER ============ */
+.meter{margin:8px 0 14px}
+.meter .ml{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px}
+.meter .ml .mk{color:var(--txt-dim)} .meter .ml .mv{font-family:var(--mono);color:var(--txt-hi)}
+.bar{height:9px;background:var(--panel2);border-radius:5px;overflow:hidden;border:1px solid var(--line)}
+.bar .fill{height:100%;border-radius:5px;background:linear-gradient(90deg,var(--acc),var(--acc2));transition:width .8s cubic-bezier(.2,.8,.3,1)}
+.bar .fill.ok{background:linear-gradient(90deg,#17a37c,var(--ok))}
+.bar .fill.warn{background:linear-gradient(90deg,#c07d1c,var(--warn))}
+.bar .fill.bad{background:linear-gradient(90deg,#b02e4c,var(--bad))}
+.bar .fill.arch{background:linear-gradient(90deg,#c0731c,var(--arch))}
+
+/* ============ PROGRESS ============ */
+.prog{display:flex;align-items:center;gap:0;margin:14px 0;flex-wrap:wrap}
+.pstep{background:var(--panel2);border:1.5px solid var(--line2);border-radius:8px;padding:7px 13px;font-size:12px;color:var(--txt-dim);position:relative}
+.pstep.done{border-color:var(--ok);color:var(--ok)}
+.pstep.now{border-color:var(--warn);color:var(--warn);box-shadow:0 0 14px rgba(255,182,72,.18)}
+.pstep.todo{border-style:dashed}
+.pconn{width:26px;height:2px;background:var(--line2);flex-shrink:0}
+
+.callout{border-left:3px solid var(--acc);background:rgba(61,169,252,.06);padding:11px 16px;border-radius:0 8px 8px 0;margin:12px 0;font-size:13px}
+.callout.warn{border-color:var(--warn);background:rgba(255,182,72,.06)}
+.callout.bad{border-color:var(--bad);background:rgba(255,92,122,.07)}
+.callout.ok{border-color:var(--ok);background:rgba(46,230,168,.06)}
+.callout b{color:var(--txt-hi)}
+.tiny{font-size:11px;color:var(--txt-dim)}
+.pros li,.cons li{margin:5px 0 5px 18px;font-size:13px}
+.pros li::marker{color:var(--ok)} .cons li::marker{color:var(--bad)}
+ol,ul{padding-left:2px}
+li{margin:4px 0}
+.toc-flag{position:absolute;top:-60px}
+@media(max-width:1080px){nav{display:none}main{margin-left:0}section{padding:32px 22px}.hero{padding:36px 22px}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="brand">
+    <div class="t1">AetherGIF-V1</div>
+    <div class="t2">PMNN 物理核 · 可视化工作台</div>
+  </div>
+  <ul>
+    <li><a href="#board" class="active"><span class="n">00</span>状态总览</a></li>
+    <li><a href="#problem"><span class="n">01</span>核心问题：重建→生成</a></li>
+    <li><a href="#arch"><span class="n">02</span>架构如何运行</a></li>
+    <li><a href="#ops"><span class="n">03</span>五个物理算子</a></li>
+    <li><a href="#train"><span class="n">04</span>训练如何进行</a></li>
+    <li><a href="#versions"><span class="n">05</span>版本谱系 17 版</a></li>
+    <li><a href="#pitfalls"><span class="n">06</span>十八死穴档案</a></li>
+    <li><a href="#solved"><span class="n">07</span>已解决 vs 未解决</a></li>
+    <li><a href="#blocker"><span class="n">08</span>当前 P0 卡点</a></li>
+    <li><a href="#proscons"><span class="n">09</span>模型优缺点</a></li>
+    <li><a href="#next"><span class="n">10</span>下一步路线</a></li>
+  </ul>
+</nav>
+
+<main>
+
+<!-- ═══════════ 00 状态总览 ═══════════ -->
+<section class="hero" id="board">
+  <h1>AetherGIF-V1 <span>可视化工作台</span></h1>
+  <p class="desc">
+    基于 PMNN（物理矩阵神经网络）的 GIF 条件生成模型。物理核由 5 个算子构成：TimeField、KuramotoSync、StandingWaveFFN、DriftField、Thermodynamics——
+    <b>架构中除语言/条件模块外不含任何 Transformer / 注意力 / FFN</b>。
+    全部数字来自 27 篇技术文档与 17 个版本目录的源码、日志实测，生成时间 2026-10-14。
+  </p>
+  <div class="stat-row">
+    <div class="stat arch"><div class="k">当前主线版本</div><div class="v">v4200<small> 多模态 CLIP</small></div></div>
+    <div class="stat"><div class="k">模型参数量</div><div class="v">6,134,065</div></div>
+    <div class="stat"><div class="k">物理核参数</div><div class="v">1,791,292</div></div>
+    <div class="stat"><div class="k">条件通路参数</div><div class="v">4,342,773</div></div>
+    <div class="stat warn"><div class="k">全量训练步数</div><div class="v">0<small> 从未启动</small></div></div>
+    <div class="stat bad"><div class="k">P0 卡点</div><div class="v" style="font-size:15px">条件未分化<small> 场差 5.7e-06</small></div></div>
+    <div class="stat ok"><div class="k">已解决死穴</div><div class="v">16<small> / 18</small></div></div>
+    <div class="stat"><div class="k">训练数据</div><div class="v">14,145<small> GIF · 204 类</small></div></div>
+    <div class="stat"><div class="k">GPU</div><div class="v" style="font-size:15px">RTX 3050<small> 4GB · 步速 0.2~0.29 步/s</small></div></div>
+    <div class="stat warn"><div class="k"> codec 天花板</div><div class="v" style="font-size:15px">147.2 dB<small> 全保留 125 系数</small></div></div>
+  </div>
+  <div class="callout warn" style="margin-top:20px">
+    <b>本工作台的核心命题：</b>模型已经能<b>基于 GIF 重建 GIF</b>（v2500 单样本 PSNR 24.57 dB，用户评价 85% 还原），
+    但目标是<b>「只接收条件特征（文本/图像 CLIP 向量），不由 GIF 引导，直接生成 GIF」</b>。
+    v4200 就是这条路的当前状态——卡在「条件未分化」，即不同条件产生的输出场几乎一模一样（两两平均差 5.7e-06）。
+    这个问题解决之前，全量训练没有启动资格。
+  </div>
+</section>
+
+<!-- ═══════════ 01 核心问题 ═══════════ -->
+<section id="problem">
+  <h2><span class="no">01</span>核心问题：从「重建」到「条件生成」 <span class="tag">P0</span></h2>
+  <p class="sub">用户的原话定位：「它既然能够重建，就代表着它能够生成……用条件去重新生成，而不是用 GIF 作为引导去生成。」</p>
+
+  <div class="grid2">
+    <div class="card ok">
+      <h4>✅ 已经跑通的：重建模式（监督信号 = GIF 本身）</h4>
+      <div class="kv"><span class="k">工作方式</span><span class="v">target GIF → rfft2 → 物理场演化 → 逼近同一个场</span></div>
+      <div class="kv"><span class="k">v2500（8-ball 素材）</span><span class="v hi">PSNR 24.57 dB · 用户评价 85% 还原</span></div>
+      <div class="kv"><span class="k">v3500_t 微调后</span><span class="v">PSNR 23.32 dB · LED 网格感大幅消退</span></div>
+      <div class="kv"><span class="k">v3700（画质基准）</span><span class="v">PSNR 19.43 dB · D=125 全保留 + 修复烧焦</span></div>
+      <div class="kv"><span class="k">本质</span><span class="v">DriftField 直接把 target 场当吸引中心 → 相位被拉着对齐</span></div>
+      <div class="callout ok" style="margin-top:10px">重建通路里，<b>漂移场是唯一把 target 送进相位演化的通路</b>（正磁场只做自洽同步不带 target 信息，两者缺一即死——第六死穴验证过）。这是项目铁律。</div>
+    </div>
+    <div class="card bad">
+      <h4>❌ 尚未跑通的：条件生成模式（监督信号 = 条件特征）</h4>
+      <div class="kv"><span class="k">工作方式</span><span class="v">cond_vec[2049] → 预测场 → 演化 → 生成 GIF（target 只在 loss 侧）</span></div>
+      <div class="kv"><span class="k">v3700 条件调制器</span><span class="v lo">PSNR 13.73 dB</span></div>
+      <div class="kv"><span class="k">v4200 短训（40 步）</span><span class="v">cos 0.98 · 但 a_out 钉死 0.1968</span></div>
+      <div class="kv"><span class="k">条件场差（150 步）</span><span class="v lo">5.7e-06（需要 ≫ 1e-5）</span></div>
+      <div class="kv"><span class="k">混合权重 std</span><span class="v lo">0.00121（均匀基线 0.03634，仅 3.3%）</span></div>
+      <div class="callout bad" style="margin-top:10px">诊断（CondPrototypes 弃用记录原文）：<b>「这不是训练不足，是通路从未被优化。跑 7 天也不会变。」</b> CondPrototypes 的生成分支 `if targets is None` 一次都没执行过，梯度恒为 0，best.pt 里 prototypes std=0.01963 ≈ 初值 0.02。</div>
+    </div>
+  </div>
+
+  <h3>生成模式的三种能力（同一模型、三种条件采样）</h3>
+  <div class="grid3">
+    <div class="card"><h4>📝 文生 GIF <span class="pill ok">mode=text</span></h4>
+      <div class="kv"><span class="k">text_emb</span><span class="v">真实 [1024]</span></div>
+      <div class="kv"><span class="k">image_emb</span><span class="v">零向量</span></div>
+      <div class="kv"><span class="k">has_image</span><span class="v">0</span></div>
+      <div class="tiny" style="margin-top:6px">产物状态：❌ 无任何 text-only 生成 GIF 存档</div></div>
+    <div class="card"><h4>🖼️ 图生 GIF <span class="pill ok">mode=image</span></h4>
+      <div class="kv"><span class="k">text_emb</span><span class="v">零向量</span></div>
+      <div class="kv"><span class="k">image_emb</span><span class="v">真实 [1024]</span></div>
+      <div class="kv"><span class="k">has_image</span><span class="v">1</span></div>
+      <div class="tiny" style="margin-top:6px">产物状态：❌ 无任何 image-only 生成 GIF 存档</div></div>
+    <div class="card"><h4>🔀 图文生 GIF <span class="pill ok">mode=both</span></h4>
+      <div class="kv"><span class="k">text_emb</span><span class="v">真实 [1024]</span></div>
+      <div class="kv"><span class="k">image_emb</span><span class="v">真实 [1024]</span></div>
+      <div class="kv"><span class="k">has_image</span><span class="v">1</span></div>
+      <div class="tiny" style="margin-top:6px">产物状态：仅 6 个 text+b_img 短训 GIF（Lucky-Star / Clannad / KonoSuba / Yuru-Camp / Toradora / K-On）</div></div>
+  </div>
+  <p class="tiny">训练时默认 mix 模式，1/3 : 1/3 : 1/3 随机三种采样（实际采样分布从未核对过——见第 20 号文档 §4.3）。</p>
+
+  <h3>生成能力的判决工具：diag_compose 三指标 <span class="pill bad">从未运行</span></h3>
+  <div class="grid3">
+    <div class="card warn"><h4>指标 1 · 记忆 or 生成</h4>
+      <p class="tiny">同条件两次生成是否不同。相同 → 在查表/背下训练样本；不同（rel = d_a/mean|a| &gt; 0.02）→ 起点随机 + 条件引导 = 生成（扩散模型同款机制）。</p></div>
+    <div class="card warn"><h4>指标 2 · 条件连续性</h4>
+      <p class="tiny">两个条件按 w∈[0,0.25,0.5,0.75,1.0] 插值，预测场是否平滑变化。平滑 → 学到连续映射 f(cond)→field，<b>中间条件（训练集没有的）也有意义</b>——这正是用户要的「在见过的里面组合出没见过的」。</p></div>
+    <div class="card warn"><h4>指标 3 · 信息量体检</h4>
+      <p class="tiny">条件维度 2049，场维度 6144×250 = 1,536,000，压缩比 750:1。单个条件不可能唯一确定一个场——模型学到的必然是<b>该条件下的典型场（条件期望）</b>。驻波基 27×250=6,750 维是组合能力上限。</p></div>
+  </div>
+</section>
+
+<!-- ═══════════ 02 架构如何运行 ═══════════ -->
+<section id="arch">
+  <h2><span class="no">02</span>架构如何运行 <span class="tag">数据流</span></h2>
+  <p class="sub">编解码口径常量：IMG=128 · GRID=32 · PATCH=4 · WIN=5 · TS=6 · N=6144 · D=125 · NORM=10.0。N = time_step × grid² = 6×32² = 6144（无 WIN 维）。</p>
+
+  <div class="frow" style="align-items:stretch">
+    <!-- 左：重建/训练通路 -->
+    <div class="fcol">
+      <div class="branch" style="border-color:var(--acc)">
+        <div class="bt" style="color:var(--acc)">▶ 训练时 · 编码通路（重建模式）</div>
+        <div class="flow">
+          <div class="fnode io"><div class="ft">GIF 素材</div><div class="fd">128×128×3 · TS=6 帧 · 逐帧 seek 后 convert("RGB")</div></div>
+          <div class="farrow"><span class="flbl">4×4 patch 切块</span></div>
+          <div class="fnode"><div class="ft">空间网格化</div><div class="fd">GRID=32 → 32×32 网格 × WIN=5 窗口 × patch 4×4</div></div>
+          <div class="farrow"><span class="flbl">rfft2（严格互逆，往返误差 5.96e-07）</span></div>
+          <div class="fnode io"><div class="ft">复值振子场 [B, N=6144, 250]</div><div class="fd">125 系数 × 2（实部+虚部）· 真实网格 5×25=125</div></div>
+          <div class="farrow"><span class="flbl">NORM=10.0 归一化 → 振幅 a / 相位 θ</span></div>
+          <div class="fnode loss"><div class="ft">target 场 a_tar / θ_tar</div><div class="fd">进入 loss 侧 + DriftField 吸引中心（训练时）</div></div>
+        </div>
+      </div>
+    </div>
+    <!-- 中：物理核 -->
+    <div class="fcol" style="flex:1.35">
+      <div class="branch" style="border-color:var(--arch);background:rgba(255,159,67,.035)">
+        <div class="bt" style="color:var(--arch)">◈ PMNNCore · 12 个 PhysicsBlock 串联演化</div>
+        <div class="flow">
+          <div class="fnode core"><div class="ft">输入场 [B, 6144, 250]</div><div class="fd">a=振幅, θ=相位（分两路演化）</div></div>
+          <div class="farrow"><span class="flbl">× 12 block 重复</span></div>
+          <div class="fnode core"><div class="ft">① TimeField</div><div class="fd">协议曲线 κ(t)=κ_max·t^p·exp(−t/τ_c) · n_drive_freq=16 驱动频率</div></div>
+          <div class="farrow short"></div>
+          <div class="fnode core"><div class="ft">② KuramotoSync</div><div class="fd">dθ = ω + struct(Toeplitz) + mf(平均场) + κ·g(漂移场)</div></div>
+          <div class="farrow short"></div>
+          <div class="fnode core"><div class="ft">③ StandingWaveFFN</div><div class="fd">共振传递函数 H(ω)=|H|·e^{iφ} · 输出 log 振幅残差 + 相位残差（R2 加相位头）</div></div>
+          <div class="farrow short"></div>
+          <div class="fnode core"><div class="ft">④ DriftField</div><div class="fd">相位空间直接吸引 g = direct_w·sin(θ_tar−θ_i) + 空间 softmax 平均</div></div>
+          <div class="farrow short"></div>
+          <div class="fnode core" style="opacity:.55"><div class="ft">⑤ Thermodynamics</div><div class="fd">⚠ 零梯度接入 · 全项目只有 import / 实例化未用 / docstring 三处引用</div></div>
+          <div class="farrow"><span class="flbl">振幅 OU 递推（log 域乘性）</span></div>
+          <div class="fnode core"><div class="ft">振幅演化</div><div class="fd">m_new = m + γ_lvl·(μ−m) · δ_new = (1−γ_shape)·δ + res · a_new = exp(clamp(−20,5))</div></div>
+          <div class="farrow"></div>
+          <div class="fnode core"><div class="ft">输出场 [B, 6144, 250]</div><div class="fd">→ irfft2 逆变换 → 解码回 GIF</div></div>
+        </div>
+      </div>
+    </div>
+    <!-- 右：条件通路 -->
+    <div class="fcol">
+      <div class="branch" style="border-color:var(--acc2)">
+        <div class="bt" style="color:var(--acc2)">◆ v4200 条件入口（生成模式）</div>
+        <div class="flow">
+          <div class="fnode cond"><div class="ft">文本 / 图像</div><div class="fd">文本描述 · 图像首帧 PNG</div></div>
+          <div class="farrow"><span class="flbl">jina-clip-v2 塔级分裂</span></div>
+          <div class="fnode cond"><div class="ft">CLIP 双塔</div><div class="fd">视觉塔 304M GPU fp16(1.73GB) · 文本塔 561M CPU fp32(LoRA 恒占 490MB)</div></div>
+          <div class="farrow"><span class="flbl">concat + has_image 标志位</span></div>
+          <div class="fnode cond"><div class="ft">cond_vec [2049]</div><div class="fd">1024 text + 1024 image + 1 has_image</div></div>
+          <div class="farrow"></div>
+          <div class="fnode cond"><div class="ft">CondProjector（1,838,594 参数）</div><div class="fd">2049 → 256 → 896</div></div>
+          <div class="farrow"><span class="flbl">4 个物理调制头（225,145 参数）</span></div>
+          <div class="fnode cond"><div class="ft">omega_bias / drift_target / kappa / T</div><div class="fd">直接改写物理超参数 · 2049→125 ×4</div></div>
+          <div class="farrow"><span class="flbl">★ 内容生成通路（2,273,239 参数）</span></div>
+          <div class="fnode cond" style="border-color:var(--warn);box-shadow:0 0 18px rgba(255,182,72,.13)"><div class="ft">CondFieldPredictor</div><div class="fd">27 个驻波基混合预测「吸引中心场」<br>chan_amp[27,250] × (1+tanh(to_chan(cond))·0.5) · 条件自由度 27×250</div></div>
+          <div class="farrow"><span class="flbl">预测场注入 DriftField 吸引中心</span></div>
+          <div class="fnode core"><div class="ft">→ 进入 PMNNCore 演化</div><div class="fd">use_cond_field=True 时替换 target 吸引中心</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3>关键口径铁律（违背即出 bug，全部实测过）</h3>
+  <div class="grid2">
+    <div class="card">
+      <h4>通道 ↔ 网格映射</h4>
+      <p class="tiny">rfft2 真实网格 = 5 × 25 = 125。通道 c ↔ (h = c//25, <b>w = c%25</b>)。<b>分频段必须按 w 切</b>——按 0/16/32/48 均分会混淆 DC 与高频（第十二死穴踩过）。c=0/25/50 是 w=0 列，承载 target 97.2% 能量。h=0 占时间频率能量 79.72%。</p>
+    </div>
+    <div class="card">
+      <h4>量纲一致性</h4>
+      <p class="tiny">架构递推与 loss 必须同一变换：L=log1p(a) → m=mean_N(L) → m_new=m+γ_lvl(μ−m) → a_new=expm1(L_new.clamp(0,6))。改 loss 变换必须同步改 block.py 递推 + a_mu 初值（log1p(0.05)=0.0488 vs log(0.05)=−3.0，差 3.05 单位）+ μ 的 lr 倍率。判据 |mean_N(log1p(a)) − a_mu| &lt; 0.01。</p>
+    </div>
+    <div class="card">
+      <h4>FFT 系数极重尾</h4>
+      <p class="tiny">a_tar 中位数 0.0015 / p90 0.18 / p99 5.4；69.4% 系数幅度 &lt; 0.01，其 θ_tar 是纯数值噪声。振幅走 log1p、相位走 a_tar² 功率加权。8-ball 素材 std/mean = 5.750。</p>
+    </div>
+    <div class="card">
+      <h4>硬约束</h4>
+      <p class="tiny">① 除语言/条件模块外不得出现 Transformer/注意力/FFN；② 禁止注入数据先验（不用 target 谱初始化 μ、不用 set_amp_prior、不用时序中值造伪标签）；③ ω 必须确定性（每次前向重采样 = 每次换动力系统）；④ OU 平衡点必须 per-channel（每通道振幅均值跨 727 倍）。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 03 五个物理算子 ═══════════ -->
+<section id="ops">
+  <h2><span class="no">03</span>五个物理算子 <span class="tag">PMNN 核心</span></h2>
+  <p class="sub">物理核共 1,791,292 参数（v4200 与 v2500 方案 D 同代，一行未改）。核心矛盾：耦合结构是零参数结构先验（第二死穴），唯一可训练的是 ω 偏移、κ 缩放与驻波 FFN。</p>
+
+  <div class="grid3">
+    <div class="card arch">
+      <h4>① TimeField 时间场</h4>
+      <div class="kv"><span class="k">职责</span><span class="v">协议曲线 κ(t) 驱动演化深度</span></div>
+      <div class="kv"><span class="k">默认参数</span><span class="v">n_blocks=12 · κ_max=16 · t_c=0.3 · τ_c=0.15 · p=1.5 · 16 驱动频率 (0.5~3.0)</span></div>
+      <div class="kv"><span class="k">参数敏感性</span><span class="v lo">从未系统扫描</span></div>
+      <p class="tiny" style="margin-top:8px">κ_max 8→16、t_c 0.5→0.3 是 R5「振幅爆炸急救」改的，非系统扫描。零训练时 cos 仅 0.11（指数趋近需 ~300 步深度 vs 只有 12 块）。</p>
+    </div>
+    <div class="card arch">
+      <h4>② KuramotoSync 相位同步</h4>
+      <div class="kv"><span class="k">递推</span><span class="v">dθ = ω + struct + mf + κ·g</span></div>
+      <div class="kv"><span class="k">struct/mf</span><span class="v lo">零参数结构先验（grad_norm 恒 0）</span></div>
+      <div class="kv"><span class="k">可训练自由度</span><span class="v">ω 偏移 + κ 缩放（仅此）</span></div>
+      <p class="tiny" style="margin-top:8px">对照 UN-0 架构「耦合矩阵 K 是最主要可学习参数」——AetherGIF 的耦合是零参数先验，这是架构层面核心差距。但「零 Transformer/注意力」硬约束禁止全可学习 K[N,N]，故走物理化路线。相位软饱和：dθ = ω_max·tanh(dθ/ω_max)，ω_max=8.0（Ω_max=2.0 会杀死动画，frame-diff 0.24）。</p>
+    </div>
+    <div class="card arch">
+      <h4>③ StandingWaveFFN 驻波 FFN</h4>
+      <div class="kv"><span class="k">职责</span><span class="v">共振传递 · 同时改幅度和相位</span></div>
+      <div class="kv"><span class="k">相位头</span><span class="v hi">w2: D→2D 零初始化（R2 修法）</span></div>
+      <div class="kv"><span class="k">参数</span><span class="v">γ=0.3 · 4×4 模式 · T_ref=20 · X/Y_ref=32</span></div>
+      <p class="tiny" style="margin-top:8px">共振传递函数是复值 |H(ω)|·e^{iφ(ω)}。R2 之前相位 loss 完全不降（drift/kuramoto/time_field 三个 grad_norm = 0.000000）；加相位输出头后 phase loss 首次实质下降 1.87→1.36，wcos 0.43→0.54。</p>
+    </div>
+    <div class="card arch">
+      <h4>④ DriftField 漂移场</h4>
+      <div class="kv"><span class="k">职责</span><span class="v hi">唯一把 target 送进相位演化的通路</span></div>
+      <div class="kv"><span class="k">空间平均上限</span><span class="v lo">cos 0.42（R6 实测）</span></div>
+      <div class="kv"><span class="k">直接吸引</span><span class="v hi">cos 0.998</span></div>
+      <div class="kv"><span class="k">合并后</span><span class="v hi">cos 0.42 → 0.82</span></div>
+      <p class="tiny" style="margin-top:8px">权重 = 相位余弦距离，力 = sin(θ_j^tar − θ_i)。v2500_D125_谱修复恢复了排斥项 V = V⁺ − λV⁻ 双分量，但其对 cos/PSNR 的贡献<b>无单独消融数据</b>。</p>
+    </div>
+    <div class="card arch" style="opacity:.75">
+      <h4>⑤ Thermodynamics 热力学</h4>
+      <div class="kv"><span class="k">职责（设计）</span><span class="v">U 能量 / S 熵 / F 自由能正则</span></div>
+      <div class="kv"><span class="k">实际状态</span><span class="v lo">零梯度接入 · 从未参与 loss</span></div>
+      <div class="kv"><span class="k">前置缺陷</span><span class="v lo">amplitude_entropy_channel 沿 N 维 softmax，与注释「每通道一个分布」不一致</span></div>
+      <p class="tiny" style="margin-top:8px">所谓「热力学层已经在管这件事」的前提不成立——它根本没在管。v4000 方案 C 启用前必须先修实现。</p>
+    </div>
+    <div class="card cond">
+      <h4>◆ CondFieldPredictor 条件场预测器（v4200 新增）</h4>
+      <div class="kv"><span class="k">chan_amp</span><span class="v">6,750 [27,250]</span></div>
+      <div class="kv"><span class="k">w_proj</span><span class="v">524,800（2049→256）</span></div>
+      <div class="kv"><span class="k">to_weight</span><span class="v">6,939（256→27 混合权重）</span></div>
+      <div class="kv"><span class="k">to_chan ★</span><span class="v">1,734,750（条件通道调制）</span></div>
+      <div class="kv"><span class="k">当前读数</span><span class="v lo">场差 5.7e-06 · 权重 std 0.00121</span></div>
+      <p class="tiny" style="margin-top:8px">amp[b,k,c] = chan_amp[k,c] · (1 + tanh(to_chan(cond))[b,k,c]·0.5)，条件自由度从 27 升到 27×250。supervise() 做逐位置中心化（去 DC）但保留幅度尺度——第一版做范数归一把幅度自由度删了，150 步后 chan_amp std=0.02015 ≈ 初值。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 04 训练 ═══════════ -->
+<section id="train">
+  <h2><span class="no">04</span>训练如何进行 <span class="tag">流程</span></h2>
+  <p class="sub">v4200 训练脚本 train_multimodal.py（1112 行）。计划 lr：3e-05 →(warmup 300)→ 0.0003 →(cosine)→ 1e-05。早停已禁用（会跑满预算）。</p>
+
+  <h3>训练单步流程</h3>
+  <div class="prog">
+    <div class="pstep done">数据采样（mix 三模态 1/3）</div><div class="pconn"></div>
+    <div class="pstep done">读 GIF → rfft2 编码场</div><div class="pconn"></div>
+    <div class="pstep done">CLIP cond_vec 查缓存（离线预编码）</div><div class="pconn"></div>
+    <div class="pstep done">12 block 物理演化（batch=1）</div><div class="pconn"></div>
+    <div class="pstep done">loss = amp + phase + 0.5·gain + gen_weight·sup</div><div class="pconn"></div>
+    <div class="pstep now">反向传播 + Adam</div><div class="pconn"></div>
+    <div class="pstep todo">验证（每 250 步，16 个独占 group）</div>
+  </div>
+
+  <h3>数据管线（v4200）</h3>
+  <div class="grid4">
+    <div class="card"><h4>GIF 数据集</h4><div class="kv"><span class="k">总数</span><span class="v">14,145</span></div><div class="kv"><span class="k">文本 group</span><span class="v">204 类</span></div><div class="kv"><span class="k">图像特征</span><span class="v hi">14,145（100%）</span></div></div>
+    <div class="card"><h4>离线预编码</h4><div class="kv"><span class="k">总耗时</span><span class="v">1:24:08</span></div><div class="kv"><span class="k">速率</span><span class="v">2.2~3.0 张/s</span></div><div class="kv"><span class="k">成功率</span><span class="v hi">14145/14145</span></div></div>
+    <div class="card"><h4>group 级隔离</h4><div class="kv"><span class="k">验证集独占 group</span><span class="v">16 个</span></div><div class="kv"><span class="k">与训练重叠</span><span class="v hi">0 个</span></div><div class="kv"><span class="k">典型划分</span><span class="v">训练 400 / 验证 12</span></div></div>
+    <div class="card warn"><h4>87GB 场缓存</h4><div class="kv"><span class="k">方案</span><span class="v">已放弃</span></div><div class="kv"><span class="k">替代</span><span class="v">实时 FFT 编码</span></div><div class="kv"><span class="k">放弃依据</span><span class="v warn">无量化记录</span></div></div>
+  </div>
+
+  <h3>训练日志实测（v4200 的 9 份日志全部是短训/smoke）</h3>
+  <table>
+    <tr><th>日志</th><th class="num">步数</th><th class="num">参数量</th><th class="num">均速</th><th>关键读数</th></tr>
+    <tr><td>logs_verify.txt</td><td class="num">15</td><td class="num">3,860,826</td><td class="num">0.26~0.28 步/s</td><td class="tiny">初态 cos 0.9887（初始相位恰好对齐）</td></tr>
+    <tr><td>logs_gen_test.txt</td><td class="num">30</td><td class="num">4,418,075</td><td class="num">0.21~0.28 步/s</td><td class="tiny">cos −0.0005→+0.9951（相位学了，幅度没学）</td></tr>
+    <tr><td>logs_final.txt</td><td class="num">40</td><td class="num">4,399,316</td><td class="num">0.20~0.29 步/s</td><td class="tiny">a_out 钉死 0.1968~0.1975 · 谱比中位 8.94 · 验证 loss inf</td></tr>
+    <tr><td>logs_sup.txt</td><td class="num">150（实际 86 步中断）</td><td class="num">4,399,315</td><td class="num">0.17~0.30 步/s</td><td class="tiny">单步从 3.4s 涨到 5.9s（衰减未诊断）· 产出 5.7e-06 场差</td></tr>
+  </table>
+
+  <div class="callout bad">
+    <b>核心矛盾：</b>7 天预算按 0.2~0.29 步/s 只能推出 <b>15~150 步</b>，而 warmup 就要 300 步。
+    日志里 `[PLAN] 总步数 = 150/40/30/15` 全是 smoke/短测试——<b>真正的全量训练从未启动</b>。
+    步速是根本瓶颈：compile=False、无 AMP、batch=1。另外「最佳验证 loss inf @ step 0」说明验证循环可能有 bug，未排查。
+  </div>
+
+  <h3>40 步完整训练读数（logs_final.txt）</h3>
+  <div class="grid3">
+    <div class="meter"><div class="ml"><span class="mk">相位对齐 cos（原始）</span><span class="mv">−0.0046 → +0.9776</span></div><div class="bar"><div class="fill ok" style="width:98%"></div></div><span class="tiny">20 步就到 0.99，相位学得最快</span></div>
+    <div class="meter"><div class="ml"><span class="mk">功率加权 wcos</span><span class="mv">+0.1420 → +0.7087</span></div><div class="bar"><div class="fill warn" style="width:71%"></div></div><span class="tiny">40 步回落（那批是 image 模态，batch 间波动）</span></div>
+    <div class="meter"><div class="ml"><span class="mk">振幅 a_out</span><span class="mv">钉死 0.1968~0.1975</span></div><div class="bar"><div class="fill bad" style="width:8%"></div></div><span class="tiny">几乎没学（v2500 时代「a_out 停在 0.2」的重演）</span></div>
+    <div class="meter"><div class="ml"><span class="mk">谱包络 prof_cos</span><span class="mv">0.2369 → 0.1832</span></div><div class="bar"><div class="fill bad" style="width:18%"></div></div><span class="tiny">相关度下降</span></div>
+    <div class="meter"><div class="ml"><span class="mk">谱比（模型/target）中位</span><span class="mv">7.72 → 8.94</span></div><div class="bar"><div class="fill bad" style="width:12%"></div></div><span class="tiny">整体幅度是 target 的 8~9 倍</span></div>
+    <div class="meter"><div class="ml"><span class="mk">总 loss ema</span><span class="mv">4.93 → 3.63</span></div><div class="bar"><div class="fill warn" style="width:36%"></div></div><span class="tiny">40 步内主要降的是相位分量</span></div>
+  </div>
+
+  <h3>历史训练配置一览</h3>
+  <table>
+    <tr><th>版本</th><th class="num">步数</th><th class="num">lr</th><th>振幅权重</th><th>特殊</th></tr>
+    <tr><td>v2500 方案 D</td><td class="num">2500</td><td class="num">3e-4</td><td class="num">AMP_P=0.5</td><td class="tiny">单样本过拟合（8-ball）· 无额外 loss</td></tr>
+    <tr><td>v2500 泛化测试</td><td class="num">2500</td><td class="num">3e-4</td><td class="num">AMP_P=0.5</td><td class="tiny">换新素材 3D87B14F</td></tr>
+    <tr><td>v3000 方案 H</td><td class="num">3000</td><td class="num">3e-4</td><td class="num">等权</td><td class="tiny">a_mu ×5 · warmup 5%</td></tr>
+    <tr><td>v3000I</td><td class="num">3000</td><td class="num">3e-4</td><td class="num">等权</td><td class="tiny">a_mu ×20</td></tr>
+    <tr><td>v3000J</td><td class="num">3000</td><td class="num">3e-4</td><td class="num">等权</td><td class="tiny">CST_W=1.0 对比度 loss</td></tr>
+    <tr><td>v3000K</td><td class="num">150（计划 3000）</td><td class="num">3e-4</td><td class="num">等权</td><td class="tiny">EN_W=2.0 + CST_W=4.0 · 长训被用户中止</td></tr>
+    <tr><td>v3500 EDGE+NOISE</td><td class="num">1000</td><td class="num">3e-5</td><td class="num">AMP_P=0.5</td><td class="tiny">EDGE_W=1.0 + NOISE_W=0.3</td></tr>
+    <tr><td>v3500_t texture+std</td><td class="num">1000</td><td class="num">1e-4</td><td class="num">AMP_P=0.5</td><td class="tiny">TEXTURE_W=1.0 + STD_W=2.0 + EDGE_W=1.0 · STD_FLOOR=0.75</td></tr>
+    <tr><td>v3600 / v3700</td><td class="num">2500</td><td class="num">3e-4</td><td class="num">AMP_P=0.5</td><td class="tiny">v3700 加 GAIN_W=0.5 高频增益 + RAD_W=1.0 Nyquist 环</td></tr>
+    <tr><td>v4200</td><td class="num">0（全量未启动）</td><td class="num">3e-5→3e-4→1e-5</td><td class="num">—</td><td class="tiny">WarmupCosine · 7 天预算 · 14145 GIF</td></tr>
+  </table>
+  <p class="tiny">调参纪律：改 loss 先跑 150 步比同步数指标，方向错立刻终止；试跑必须带 OVERFIT_TAG 防产物覆盖；跑训练前先 py_compile；lr 太低（3e-5）时模型走捷径，提到 1e-4 后 std 守卫才触底反弹。</p>
+</section>
+
+<!-- ═══════════ 05 版本谱系 ═══════════ -->
+<section id="versions">
+  <h2><span class="no">05</span>版本谱系 · 17 个代码快照 <span class="tag">2026-10-11 → 10-14</span></h2>
+  <p class="sub">参数量是区分架构版本最可靠的指纹（权重互不兼容的直接原因）。点击任意版本展开详情。</p>
+
+  <div class="tl">
+    <div class="titem ok" onclick="this.classList.toggle('open')">
+      <div class="tt"><span class="ver">v2500 方案D</span>视觉最优基线 · 1,135,658 参数</div>
+      <div class="td">PSNR 24.57 dB · 用户评价 85% 还原 · 但能量分布严重失真（DC 仅占 18.1%，target 97.2%）——「噪声冒充细节」</div>
+      <div class="tdetail">网格比 1.620（素材 1.010 · codec 顶 1.218）· 像素 std 27.8（素材 42.8）· Sobel 11.33（素材 4.20）· 边界跳变 19.92（素材 4.99）。v2500 整体过度锐化 2~3 倍，它的「质感」是高频噪点，不是细节。冻结基线在 _archive 只读。</div>
+    </div>
+    <div class="titem warn" onclick="this.classList.toggle('open')">
+      <div class="tt"><span class="ver">v2500_3DFFT修复 / D125_3DFFT / 加速 / 谱修复</span>四个「审查修复」分支 · 全部没跑完长训</div>
+      <div class="td">宣称的改进（PSNR&gt;35dB）均无实测支撑 · 3DFFT修复版的日志与基线逐字节相同（修复版外壳 + 基线日志）</div>
+      <div class="tdetail">v2500_D125_谱修复参数量 3,759,609（1 共享 μ + 单 γ 可训练，log 域，仅冒烟）。谱修复恢复了排斥项双分量，但其贡献无单独消融。D125 全保留实测 PSNR 147.20 dB · 网格比 1.062=素材原值 · 往返误差 5.96e-07 → 网格感 100% 来自截断。</div>
+    </div>
+    <div class="titem ok" onclick="this.classList.toggle('open')">
+      <div class="tt"><span class="ver">v2500 泛化测试</span>第二素材验证 · 19.91 dB</div>
+      <div class="td">同一架构换新素材（3D87B14F 二次元头像）· frame-diff 22.57/19.65</div>
+      <div class="tdetail">证明架构不限单一素材，但 PSNR 比 8-ball 低 4.7 dB。v3600 起此素材成为主素材。</div>
+    </div>
+    <div class="titem warn" onclick="this.classList.toggle('open')">
+      <div class="tt"><span class="ver">v3000 H / I / J / K</span>架构正确合成 · 1,134,966 参数</div>
+      <div class="td">H 修量纲错位但引入 expm1 硬截断 · I 是「log 域 + 双 γ 冻结 + 共享 μ」正确合成 · J 加对比度 · K 加 energy loss</div>
+      <div class="tdetail">方案 I 能量分布几乎完美（DC 96.2%）但视觉发糊——引出第十五死穴（平均值度量骗人）。v3000K 150 步验证：w13-18 从 11.70%（超载 61×）→ 0.07%，尖峰从 c16 归位到 c0，崩塌帧消失（最低比值 0.51）。长训被用户要求停止改走 v3500，终态无记录。</div>
+    </div>
+    <div class="titem warn" onclick="this.classList.toggle('open')">
+      <div class="tt"><span class="ver">v3500 微调 ×4</span>系统性证明「频率窗口不存在」· 1,135,658 参数</div>
+      <div class="td">EDGE+NOISE 23.16 dB · edge-only 23.95 dB · texture+std 23.32 dB · std_push 100 步中断</div>
+      <div class="tdetail">v3500_t 的 150 步验证：边界 20.06→8.47（素材 6.81）· 内部 12.07→6.07（素材 5.59）· std 触底反弹 22.0→24.1。但用户反馈「网格消失了，为什么变模糊」——第十八死穴：均值约束把轮廓 p99 压掉 45%（47→26）。loss_jump_dist 分位数修法已设计但从未实现。</div>
+    </div>
+    <div class="titem ok" onclick="this.classList.toggle('open')">
+      <div class="tt"><span class="ver">v3600</span>D=125 全保留 · 定位网格感真凶 · 2,022,232 参数</div>
+      <div class="td">往返 PSNR 28.63→49.82 dB · 但 frame-diff 过冲 30.14（target 24.82）</div>
+      <div class="tdetail">根因是 spec[:, :d_model] 的非对称硬截断（取前 64 个 = h0,h1 全留 + h2 只留 w0~13 + h3,h4 整行丢弃）。旧结论「d_model 不是瓶颈」已作废。真低通 h&lt;3,w&lt;13（39 系数）保留能量 88.4% 与前 64 个的 89.8% 几乎一样，但网格比 1.276 比前 64 的 1.192 更差——非对称比数量不足更致命。</div>
+    </div>
+    <div class="titem ok" onclick="this.classList.toggle('open')">
+      <div class="tt"><span class="ver">v3700 修复烧焦</span>当前画质基准 · 2,022,232 参数</div>
+      <div class="td">PSNR 19.43 dB · 高频增益 + Nyquist 双约束 · 条件生成探索起点</div>
+      <div class="tdetail">v3700 CLIP 条件（clip_dock）13.94 dB · 条件调制器 2,311,892 参数 13.73 dB。条件生成 v1~v4 都在这里探索。验收要求：生成质量不低于 v3700。</div>
+    </div>
+    <div class="titem dim" onclick="this.classList.toggle('open')">
+      <div class="tt"><span class="ver">v3800 / v3900 / v4000</span>三个待命骨架 · 零实验数据</div>
+      <div class="td">代码已复制自 v3700，未做任何修改 · 方案说明即设计文档</div>
+      <div class="tdetail">v3800 方案B：频率依赖衰减 λ_s(f)，+1 参数 β。v3900 方案A：可学耦合修正 α_ij，~125 参数，风险「中」（12 层叠加可能放大振荡）。v4000 方案C：热力学正则 ~2 参数，前置缺陷 amplitude_entropy_channel 实现与文档不一致。三者功能可能重叠（都在治高频堆积），无对照则选错。</div>
+    </div>
+    <div class="titem warn" onclick="this.classList.toggle('open')">
+      <div class="tt"><span class="ver">v4100</span>三场分层注意力 · 2,022,232 + 376 参数</div>
+      <div class="td">field_attention.py 已写完并集成进 block/model/overfit · 从未训练</div>
+      <div class="tdetail">core/edge/outer 逐频点可学习归属，禁止频率单调切点（对「频段按 0/16/32/48 均分导致读数失真」的修正延伸）。未验证：归属矩阵是否收敛出非平凡结构；与 v3800 方案B 是否功能重叠。</div>
+    </div>
+    <div class="titem bad" onclick="this.classList.toggle('open')">
+      <div class="tt"><span class="ver">v4200 多模态 CLIP</span>当前主线 · 6,134,065 参数</div>
+      <div class="td">卡在「条件未分化」· 全量训练从未启动 · 9 份日志全是 smoke/短测试</div>
+      <div class="tdetail">物理核 1,791,292 + cond_projector 1,838,594 + 4 调制头 225,145 + cond_field 2,273,239。参数量在日志里出现过 4 个旧值（3,860,826 / 4,418,075 / 4,399,315 / 4,399,316），对应不同代码状态。cond_prototypes.py 已弃用（死代码未清理）。</div>
+    </div>
+  </div>
+
+  <h3>权重兼容性</h3>
+  <table>
+    <tr><th>版本组</th><th class="num">参数量</th><th>兼容性</th></tr>
+    <tr><td>v2500 ↔ v3500 微调</td><td class="num">1,135,658</td><td><span class="st ok">✅ 兼容</span> <span class="tiny">v3500 从 v2500 续训，missing=0 unexpected=0</span></td></tr>
+    <tr><td>v2500 ↔ v3000</td><td class="num">1,135,658 vs 1,134,966</td><td><span class="st no">❌ 不兼容</span> <span class="tiny">a_mu 12→1 · γ 结构不同 · 递推域不同</span></td></tr>
+    <tr><td>v3600/v3700 ↔ v2500</td><td class="num">2,022,232 vs 1,135,658</td><td><span class="st no">❌ 不兼容</span> <span class="tiny">d_model 64→125</span></td></tr>
+    <tr><td>v4200 ↔ 任何旧版</td><td class="num">6,134,065</td><td><span class="st no">❌ 不兼容</span> <span class="tiny">cond_projector/cond_field 全新模块</span></td></tr>
+    <tr><td>早期 Qwen 全参数版</td><td class="num">494,970,898</td><td><span class="st dim">已放弃</span> <span class="tiny">train_real.txt 时代，8 GIF · 6 epoch</span></td></tr>
+  </table>
+</section>
+
+<!-- ═══════════ 06 死穴 ═══════════ -->
+<section id="pitfalls">
+  <h2><span class="no">06</span>十八死穴全档案 <span class="tag">点击筛选</span></h2>
+  <p class="sub">死穴 = 定位并有编号的失败模式。每条含现象（实测数值）→ 根因（代码位置）→ 修法 → 验证数据。左侧 1~14 是「通路能不能学」，3/15~18 是「学好了度量会不会骗人」。</p>
+
+  <div class="filterbar">
+    <button class="fbtn on" data-f="all">全部 18</button>
+    <button class="fbtn" data-f="ok" style="color:var(--ok)">已解决 14</button>
+    <button class="fbtn" data-f="part" style="color:var(--warn)">部分/回避 3</button>
+    <button class="fbtn" data-f="no" style="color:var(--bad)">未解决 1</button>
+    <button class="fbtn" data-f="arch" style="color:var(--arch)">架构性 2</button>
+  </div>
+
+  <table id="ptable">
+    <tr><th>#</th><th>名称</th><th>版本</th><th>状态</th><th>现象（实测）</th><th>根因 / 修法</th></tr>
+    <tr data-st="ok"><td class="num">1</td><td>振幅被 LayerNorm/softplus 锁死</td><td>R1</td><td><span class="st ok">已修</span></td><td class="tiny">PSNR 15.97 · a_out 锁 0.75（target 0.195）</td><td class="tiny">加性+归一化抹平重尾 → log 域乘性演化 a·exp(res)。a_out 0.75→0.1985。<b>教训：重尾量只能乘性更新</b></td></tr>
+    <tr data-st="ok"><td class="num">2</td><td>零参数物理核</td><td>R2</td><td><span class="st ok">已修</span></td><td class="tiny">phase loss 不降 · drift/kuramoto/time_field grad_norm 全 0.000000</td><td class="tiny">耦合全是零参数先验 → FFN 加相位输出头（w2: D→2D 零初始化）。phase loss 1.87→1.36</td></tr>
+    <tr data-st="ok"><td class="num">3</td><td>相位噪声主导梯度</td><td>R3</td><td><span class="st ok">已修</span></td><td class="tiny">功率加权后 cos 仍卡 0.38</td><td class="tiny">69.4% 系数 θ_tar 是纯数值噪声 → 功率加权 a_tar²。<b>但「加权平均」是第十五死穴的种子</b></td></tr>
+    <tr data-st="ok"><td class="num">4</td><td>相位折叠与饱和</td><td>R4</td><td><span class="st ok">已修</span></td><td class="tiny">frame-diff 14.7 · cos 钉 0.4169</td><td class="tiny">中间 remainder 折叠断梯度 → θ 连续累积 + 软饱和 tanh。Ω_max 2.0 杀死动画 → 8.0</td></tr>
+    <tr data-st="ok"><td class="num">5</td><td>振幅爆炸与 OU 缺失</td><td>R5</td><td><span class="st ok">已修</span></td><td class="tiny">a_out 爆 100× · frame-diff 塌 0.02</td><td class="tiny">log 残差 12 层堆叠溢出 → OU 回复力。frame-diff 0.02→2.28</td></tr>
+    <tr data-st="ok"><td class="num">6</td><td>漂移场空间平均上限</td><td>R6</td><td><span class="st ok">已修</span></td><td class="tiny">cos 钉死 0.4169 到小数点后 4 位</td><td class="tiny">空间近邻平均上限 0.42 vs 直接吸引 0.998 → 叠加 direct 分量。cos 0.42→0.82</td></tr>
+    <tr data-st="ok"><td class="num">7</td><td>标量 OU 压平谱</td><td>R7</td><td><span class="st ok">已修</span></td><td class="tiny">「有轨迹没细节」· 帧内对比度仅 target 的 1/3</td><td class="tiny">每通道振幅均值跨 727 倍，标量 μ 全拉向 0.2 → per-channel μ。跨度 1×→171×，用户：「能看出球上的数字了」</td></tr>
+    <tr data-st="part"><td class="num">8</td><td>振幅 loss 尺度偏置</td><td>R8</td><td><span class="st part">已修（有副作用）</span></td><td class="tiny">消融：相位→target 只 +0.07 dB，振幅→target +5.60 dB</td><td class="tiny">log1p 给绝对误差 → log1p+(a/a_max)^0.5 软化权重。PSNR 17.60→20.74。副作用：全局尺度放大 2.5~2.8×</td></tr>
+    <tr data-st="ok"><td class="num">9</td><td>层级/形状单 γ 绑死</td><td>方案F</td><td><span class="st ok">已修</span></td><td class="tiny">μ span 0.06~0.11（target 6.589）· r̄ 越界兼职 ±0.86</td><td class="tiny">同一 γ 管两件事 → γ 拆 lvl(0.5)/shape(0.1) 冻结 + 残差零均值 + 正交递推。profile_cos 0.186→0.972</td></tr>
+    <tr data-st="ok"><td class="num">10</td><td>μ 每 block 独立只有末层有梯度</td><td>方案F</td><td><span class="st ok">已修</span></td><td class="tiny">span 卡 0.1</td><td class="tiny">贡献 ∝ (1−γ)^(11−i) 指数衰减 → block 间共享 μ_c。与第九死穴同次验证，谱跨 1×→98×</td></tr>
+    <tr data-st="arch"><td class="num">11</td><td>DC 通道能量垄断致「方块」</td><td>v2500后</td><td><span class="st arch">已定位·架构性</span></td><td class="tiny">3 个 DC 通道占 99.4% 能量 · 只替换它们 PSNR 17.62→23.49</td><td class="tiny">参数位与能量严重失配。<b>未解决</b>：DC 走更短路径 + 块间平滑约束，两者均未实现</td></tr>
+    <tr data-st="ok"><td class="num">12</td><td>log 在 a→0 处无界</td><td>方案G→H</td><td><span class="st ok">已修</span></td><td class="tiny">ch25/ch50 各有 1748/6144 位置 a&lt;1e-4</td><td class="tiny">log(1e-4)=−9.2 把整条通道拽飞 → log1p 有界域。顺带修 4 个 bug（含频段改按 w 切）</td></tr>
+    <tr data-st="ok"><td class="num">13</td><td>架构与 loss 量纲错位</td><td>方案H</td><td><span class="st ok">已修</span></td><td class="tiny">μ 报 −1.21 但实际层级 +0.34，差 1.55</td><td class="tiny">block.py log 域 vs loss log1p 域 → 架构整体搬 log1p 域 + μ 初值改 0.0488 + lr ×5。<b>复发率最高的错误类别</b></td></tr>
+    <tr data-st="part"><td class="num">14</td><td>expm1 硬截断钉死 51% 位置</td><td>方案H→I</td><td><span class="st part">已修（回避式）</span></td><td class="tiny">「像被火烧糊了」· 51% 位置 a 钉死 0</td><td class="tiny">clamp(0,6) 下限 → 方案 I 整体回退 log 域 exp(clamp(−20,5))。<b>soft 化截断从未实现</b></td></tr>
+    <tr data-st="part"><td class="num">15</td><td>log 域校准与视觉质量脱钩</td><td>v3000</td><td><span class="st part">已修（不彻底）</span></td><td class="tiny">振幅比 0.92~0.98 + wcos 0.9118 全「通过」，出图更糊</td><td class="tiny">平均值度量互相抵消 → 空间域对比度 loss。已知局限：cst loss 降到 0.85 就停止施压 → 引出第十七死穴</td></tr>
+    <tr data-st="ok"><td class="num">16</td><td>log1p 关不住尖峰</td><td>v3000J</td><td><span class="st ok">150步验证通过</span></td><td class="tiny">top-393 系数占 80.84%（target 19.23%）· c16 能量比 235.7× · a_out.max=148.41 顶在 exp(5)</td><td class="tiny">a=148 时梯度仅 0.67% → 逐通道能量比 log 差。尖峰从 c16 归位 c0（不删除而是重新分配）。150 步：w13-18 11.70%→0.07%</td></tr>
+    <tr data-st="ok"><td class="num">17</td><td>全局对比度牺牲低对比帧</td><td>v3000J</td><td><span class="st ok">150步验证通过</span></td><td class="tiny">全局 std 达标 99.4% · 帧 10~19 全崩塌到 5~6（真值 16~17）</td><td class="tiny">全局 std 被低对比帧拖累 → 逐帧对比度 loss + 崩塌判据改相对 target 50%。1~100 步近乎线性但极慢，100~150 步自激发</td></tr>
+    <tr data-st="no"><td class="num">18</td><td>均值约束压平轮廓 = 模糊</td><td>v3500_t</td><td><span class="st no">修法未实现</span></td><td class="tiny">「网格消失了，但变模糊了」· p99 轮廓 47→26（压掉 45%）· 背景 p50 0→2 没清干净</td><td class="tiny">素材是极端重尾（p50=0、p99=47、尾部 5% 占 61.6% 能量）· 均值约束把所有跳变压到中等 → <b>loss_jump_dist 分位数约束：q75 压到 target，q99 relu 单侧保护。代码未落入任何 scripts 目录</b></td></tr>
+  </table>
+
+  <div class="callout warn">
+    <b>附：Jensen 不等式误用（未编号但反复致命）。</b>
+    诊断谱包络必须与 loss 聚合顺序一致：错误口径 log(mean_N(a)) → bias −2.53、corr 0.8674；正确口径 mean_N(log(a)) → bias −0.51、corr 0.9953。重尾分布下两者差异巨大——「μ 被压低 2~3 个 log 单位导致糊」这个旧结论是用错公式得出的。
+  </div>
+
+  <h3>死穴依赖关系</h3>
+  <div class="card">
+    <pre style="font-family:var(--mono);font-size:11.5px;line-height:1.7;color:var(--txt-dim);overflow-x:auto">
+第一死穴(乘性演化) ─┬─→ 第五(OU 稳定化) ─┬─→ 第七(per-channel μ) ─┬─→ 第九(γ 正交分离)
+                   │                     │                        └─→ 第十(μ block 共享)
+                   │                     └─→ 第八(loss 尺度) ──→ 十二(log 无界) ──→ 十三(量纲统一) ──→ 十四(expm1 截断)
+                   └─→ 第三(相位功率加权) ─┐
+                                           ├─→ 第十五(平均值脱钩) ──→ 第十七(全局 std 牺牲低对比帧) ──→ 第十八(均值压平轮廓)
+                   ┌───────────────────────┘
+                   └─→ 第十六(log1p 关不住尖峰)</pre>
+    <p class="tiny" style="margin-top:8px">读法：左侧是「通路能不能学」（1~14），右侧是「学好了度量会不会骗人」（3/15/16/17/18）。右侧五个死穴全部同源——<b>任何平均值度量（log 域比、wcos、能量占比、跳变均值）都不能单独作为验收依据</b>，必须同时报空间域指标（对比度 std、动态范围 p1–p99、Sobel 锐度）。</p>
+  </div>
+</section>
+
+<!-- ═══════════ 07 已解决 vs 未解决 ═══════════ -->
+<section id="solved">
+  <h2><span class="no">07</span>已解决 vs 未解决 <span class="tag">全局视图</span></h2>
+
+  <div class="grid2">
+    <div class="card ok">
+      <h4>✅ 已彻底解决（14 项）</h4>
+      <ol class="pros">
+        <li><b>重建通路本身</b>——PSNR 24.57 dB（v2500），用户评价 85% 还原</li>
+        <li><b>振幅演化范式</b>——log 域乘性 + per-channel OU + 双 γ 正交递推 + 共享 μ（死穴 1/5/7/9/10）</li>
+        <li><b>相位可训练性</b>——FFN 相位头 + 功率加权 + 直接吸引（死穴 2/3/6）</li>
+        <li><b>量纲一致性</b>——架构与 loss 同域、μ 初值同步、lr 倍率联动（死穴 12/13）</li>
+        <li><b>频段能量失真</b>——能量比 log 差，尖峰归位而非削平（死穴 16，150 步验证）</li>
+        <li><b>逐帧崩塌</b>——逐帧对比度 + 相对 target 判据（死穴 17，150 步验证）</li>
+        <li><b>网格感真凶定位</b>——D=125 非对称硬截断（v3600），codec 全保留 147.2 dB</li>
+        <li><b>修复烧焦</b>——高频增益 + Nyquist 双约束（v3700，当前画质基准）</li>
+        <li><b>CLIP 数据管线</b>——14145/14145 全成功预编码，1:24:08，10 个坑全部踩掉并修复</li>
+        <li><b>4GB 显存塔级分裂</b>——视觉塔 GPU fp16 + 文本塔 CPU fp32 唯一可行解</li>
+      </ol>
+    </div>
+    <div class="card bad">
+      <h4>❌ 未解决（P0~P3 分级）</h4>
+      <div class="kv"><span class="k">P0 条件未分化</span><span class="v lo">场差 5.7e-06 · 权重 std 0.00121</span></div>
+      <div class="kv"><span class="k">P0 全量训练未启动</span><span class="v lo">0 步 · 步速 0.2~0.29 步/s</span></div>
+      <div class="kv"><span class="k">P0 diag_compose 三指标</span><span class="v lo">从未运行</span></div>
+      <div class="kv"><span class="k">P1 第十八死穴修法</span><span class="v lo">loss_jump_dist 未实现</span></div>
+      <div class="kv"><span class="k">P1 v3000K 长训终态</span><span class="v lo">档案缺失</span></div>
+      <div class="kv"><span class="k">P1 7 天预算步数换算</span><span class="v lo">无试跑验证</span></div>
+      <div class="kv"><span class="k">P2 v3800/v3900/v4000</span><span class="v lo">代码未改一字 · 零实验</span></div>
+      <div class="kv"><span class="k">P2 三个判决脚本</span><span class="v lo">零输出存档（不可复核）</span></div>
+      <div class="kv"><span class="k">P3 Thermodynamics</span><span class="v lo">零梯度接入</span></div>
+      <div class="kv"><span class="k">P3 DC 通道容量失配</span><span class="v lo">架构性 · 更短路径未实现</span></div>
+      <div class="callout bad" style="margin-top:10px">未解决项按阻塞关系排序：<b>条件分化 → 全量训练 → diag_compose 判决</b>是一条串行链。前两项解决之前，后面所有项都无法推进。</div>
+    </div>
+  </div>
+
+  <h3>三个待命方案与两个已写未训的代码状态</h3>
+  <table>
+    <tr><th>方案</th><th class="num">新增参数</th><th>状态</th><th>设计意图</th></tr>
+    <tr><td>v3800 方案B 频率依赖衰减</td><td class="num">+1（β）</td><td><span class="st dim">零实验</span></td><td class="tiny">λ_s(f)=λ_base·(1+β·log(f+1))，色散介质。β=0 时与 v3700 严格等价可做对照，风险极低</td></tr>
+    <tr><td>v3900 方案A 可学耦合修正</td><td class="num">~125（α_ij）</td><td><span class="st dim">零实验</span></td><td class="tiny">W_ij = exp(−λ_t|Δt|−λ_s|Δs|²)·α_ij。风险中：12 层叠加可能放大振荡。禁止学完整 [1024,1024]（1200 万参数违背铁律）</td></tr>
+    <tr><td>v4000 方案C 热力学正则</td><td class="num">~2</td><td><span class="st dim">零实验</span></td><td class="tiny">F = U − T·S。前置缺陷：Thermodynamics 实现与文档不一致，启用前必须先修</td></tr>
+    <tr><td>v4100 三场分层注意力</td><td class="num">+376</td><td><span class="st part">代码完成·从未训练</span></td><td class="tiny">core/edge/outer 逐频点归属，禁止单调切点。与 v3800 可能功能重叠，无对照</td></tr>
+    <tr><td>v4200 to_chan 条件调制</td><td class="num">+1,734,750</td><td><span class="st part">重构完成·未跑完验证</span></td><td class="tiny">条件自由度 27→27×250。to_chan 零初始化是否压死梯度（Adam 2nd moment 累积慢）未实测</td></tr>
+  </table>
+</section>
+
+<!-- ═══════════ 08 P0 卡点 ═══════════ -->
+<section id="blocker">
+  <h2><span class="no">08</span>当前 P0 卡点：条件未分化 <span class="tag">v4200</span></h2>
+  <p class="sub">「不同条件产生的输出场几乎一模一样」——模型对条件的响应可以忽略。这是从重建走向生成的唯一阻塞点。</p>
+
+  <h3>三指标全部未达标</h3>
+  <div class="grid3">
+    <div class="card">
+      <h4>混合权重跨基 std</h4>
+      <div class="meter"><div class="ml"><span class="mk">实测 0.00121</span><span class="mv">均匀基线 0.03634</span></div><div class="bar"><div class="fill bad" style="width:3.3%"></div></div></div>
+      <p class="tiny">只有均匀基线的 3.3%——softmax 权重几乎均匀分布 = 没有选择性。204 个 group 挤在 27 维基里分不开。</p>
+    </div>
+    <div class="card">
+      <h4>不同 group 输出场差</h4>
+      <div class="meter"><div class="ml"><span class="mk">实测 5.7e-06</span><span class="mv">需要 ≫ 1e-5</span></div><div class="bar"><div class="fill bad" style="width:2%"></div></div></div>
+      <p class="tiny">两两平均差 5.7e-06——不同条件的预测场几乎没有区别。（旧版 supervise 前的 40 步读数是 1.7e-06，同量级问题。）</p>
+    </div>
+    <div class="card">
+      <h4>chan_amp std</h4>
+      <div class="meter"><div class="ml"><span class="mk">实测 0.02015</span><span class="mv">初值 randn×0.02 的 std=0.02</span></div><div class="bar"><div class="fill bad" style="width:1%"></div></div></div>
+      <p class="tiny">几乎没动。第一版 supervise 做了 lp/||lp|| 范数归一，把幅度自由度从 loss 里删掉了——而幅度正是 chan_amp 唯一的表达通道。已改为只做逐位置中心化。</p>
+    </div>
+  </div>
+
+  <h3>已踩并修掉的四个坑（v4200 内部）</h3>
+  <div class="grid2">
+    <div class="card"><h4>① 早停判据二误停</h4><p class="tiny">batch=1 时 train loss 是单样本测量 vs val 是 48 样本均值，比值天然虚高。gap_ratio 从 1.15 提到 3.0。</p></div>
+    <div class="card"><h4>② update_baseline 引用未定义变量 step</h4><p class="tiny">NameError 死在第 2 步。已修：显式传 step。</p></div>
+    <div class="card"><h4>③ cond_field 早期 scalar gate 梯度被 tanh 压死</h4><p class="tiny">梯度 1.3e-08。已删 gate 参数（CondPrototypes 里保留但 tanh(0)=0 起步；CondFieldPredictor 删了）。</p></div>
+    <div class="card"><h4>④ --gen-weight 2.0→4.0 出现 NaN</h4><p class="tiny">预测场冲太大 → 漂移场 softmax 溢出。上限卡 2.0。</p></div>
+  </div>
+
+  <h3>候选解法（全部未验证）</h3>
+  <table>
+    <tr><th>#</th><th>解法</th><th>依据</th><th>风险</th></tr>
+    <tr><td class="num">1</td><td><b>to_chan 零初始化改 randn×0.02</b></td><td class="tiny">零初始化可能压死梯度（Adam 2nd moment 累积慢）</td><td class="tiny">低 · 直接对照实验可判</td></tr>
+    <tr><td class="num">2</td><td><b>cond_field 单独分组 lr（3~5× 全局）</b></td><td class="tiny">项目一贯手法（a_mu ×5/×20 有效），但 v4200 没用</td><td class="tiny">低 · 有历史先例</td></tr>
+    <tr><td class="num">3</td><td><b>gen_weight 分级 warmup</b></td><td class="tiny">从 0.5 起步，每 200 步 +0.5 到 2.0，避免预测场冲爆 softmax</td><td class="tiny">中 · 需观察相位是否被假吸引中心拉散</td></tr>
+    <tr><td class="num">4</td><td><b>条件对比 loss（不同 group 输出场差的正则）</b></td><td class="tiny">直接监督分化度本身，而非间接期待分化</td><td class="tiny">中 · 设计需防止模型用无意义噪声硬造差异</td></tr>
+    <tr><td class="num">5</td><td><b>步速治理</b>（AMP / compile / batch 策略）</td><td class="tiny">0.2~0.29 步/s 导致 150 步预算 vs 300 warmup —— 不治理连验证都做不完</td><td class="tiny">中 · compile=False 是 4GB 显存的妥协</td></tr>
+  </table>
+
+  <div class="callout warn">
+    <b>降级备选（若条件分化反复修不好）：</b>放弃「组合生成」，退回「条件引导的重建」——
+    v3700 画质 + CLIP 最近邻检索式生成。用户要的「组合出没见过的」能力会消失，但画质可保。
+    这是交接 TODO 里登记的开放问题，<b>需要用户决策</b>。
+  </div>
+</section>
+
+<!-- ═══════════ 09 优缺点 ═══════════ -->
+<section id="proscons">
+  <h2><span class="no">09</span>模型的优缺点 <span class="tag">实事求是</span></h2>
+  <div class="grid2">
+    <div class="card ok">
+      <h4>👍 优点</h4>
+      <ol class="pros">
+        <li><b>小而完整</b>：物理核 179 万参数完成 128×128×6 帧 GIF 的重建（v3700），不需要扩散模型的迭代采样</li>
+        <li><b>物理可解释</b>：每个算子有物理对应（Kuramoto 同步 = 相位锁定、OU = 布朗运动+回复力、驻波 = 共振传递函数），不是黑盒注意力</li>
+        <li><b>重建质量已验证</b>：v2500 PSNR 24.57 dB / 用户 85% 还原；v3500 微调后 LED 网格感大幅消退（边界 20.06→8.47）</li>
+        <li><b>编解码零噪声</b>：FFT 往返误差 5.96e-07，全保留 125 系数时 PSNR 147.2 dB —— 网格感 100% 来自截断，与变换本身无关</li>
+        <li><b>调试方法论健全</b>：18 个死穴全部留档（现象→根因→修法→验证数据），消融诊断工具链完整（diag_blur/diag_block/diag_spec/diag_which_ch/diag_outlier_energy）</li>
+        <li><b>4GB 显存可训</b>：batch=1 干净档 + CLIP 塔级分裂方案，单卡 3050 全流程跑通（预编码 14145 张仅 1.5 小时）</li>
+        <li><b>条件通路与物理核解耦</b>：PMNNCore 一行未改，条件只从调用侧注入——失败可回退，成功可独立归因</li>
+      </ol>
+    </div>
+    <div class="card bad">
+      <h4>👎 缺点</h4>
+      <ol class="cons">
+        <li><b>还不会生成</b>：核心目标「条件生成」零实证——条件场差 5.7e-06，三指标全不达标，全量训练从未启动</li>
+        <li><b>耦合是零参数先验</b>：与 UN-0「K 是最主要可学习参数」相反，相位可训练自由度只有 ω 偏移和 κ 缩放（第二死穴）——这是架构层面核心差距，被「零 Transformer」铁律约束</li>
+        <li><b>DC 通道容量失配（架构性）</b>：3 个 DC 通道占 96~99% 能量，却与 0.2% 能量的高频共用同一条 FFN 残差路径。方块感、糊感的总根源</li>
+        <li><b>步速极慢</b>：0.2~0.29 步/s → 7 天只能跑 15~150 步，warmup 就要 300 步。不治理连验证都做不完</li>
+        <li><b>振幅学习偷懒</b>：a_out 反复钉死在 0.2 附近（v2500 与 v4200 都有）；模型倾向用「整体压低振幅」「抬绝对值」等捷径应对 loss（第八死穴副作用、v3500 两个失败模式）</li>
+        <li><b>死代码与档案缺口</b>：cond_prototypes.py（~1.55M 参数）已弃用未清理；三个判决脚本零输出存档；v3000K 终态无记录；v2500 原始权重已丢失（重跑版）</li>
+        <li><b>验证循环可能有 bug</b>：「最佳验证 loss inf @ step 0」未排查；v4200 的 overfit.py 实际未被使用</li>
+        <li><b>环境脆弱</b>：C 盘仅剩 258MB、提交上限 36.7GB 隐形炸弹、OpenBLAS 线程未锁死会静默挂死、Windows 中文用户名导致编码错乱</li>
+      </ol>
+    </div>
+  </div>
+
+  <h3>验收基准的三次演变</h3>
+  <div class="prog">
+    <div class="pstep done">codec 天花板基准（v2500~v3500）</div><div class="pconn"></div>
+    <div class="pstep done">原始素材基准（v3500 起 accept_target）</div><div class="pconn"></div>
+    <div class="pstep now">条件分化三指标（v4200，未达标）</div>
+  </div>
+  <p class="tiny">基准铁律：降噪/锐度类验收必须以原始素材为及格线——拿 v2500（边界是素材 4 倍）当基准，「降 3%」也判 PASS 是自欺。auto_accept 四判据：① 对比度 std ≥ codec 天花板 85% ② PSNR ≥ v2500−0.5dB ③ 频段能量占比偏差 ≤1.5pp ④ 过曝 &lt;1.5% 且无崩塌帧（必须相对 target）。</p>
+</section>
+
+<!-- ═══════════ 10 下一步 ═══════════ -->
+<section id="next">
+  <h2><span class="no">10</span>下一步路线 <span class="tag">决策树</span></h2>
+  <p class="sub">串行链：条件分化 → 全量训练 → diag_compose 判决。前面的不解决，后面的都无法推进。</p>
+
+  <div class="flow" style="align-items:stretch">
+    <div class="frow">
+      <div class="fnode warn" style="min-width:220px"><div class="ft">P0a 步速治理</div><div class="fd">AMP / compile / batch 策略<br>目标：0.2 步/s → ≥0.5 步/s</div></div>
+      <div style="align-self:center;padding:0 8px;color:var(--acc)">→</div>
+      <div class="fnode warn" style="min-width:220px"><div class="ft">P0b 条件分化验证</div><div class="fd">to_chan randn 初始化 · cond_field 分组 lr<br>150 步看三指标是否离开基线</div></div>
+      <div style="align-self:center;padding:0 8px;color:var(--acc)">→</div>
+      <div class="fnode cond" style="min-width:220px"><div class="ft">P0c diag_compose 三指标</div><div class="fd">记忆 vs 生成 · 条件连续性 · 信息量<br>「组合生成能力」的最终判决</div></div>
+      <div style="align-self:center;padding:0 8px;color:var(--acc)">→</div>
+      <div class="fnode core" style="min-width:220px"><div class="ft">全量训练</div><div class="fd">7 天预算 · mix 三模态<br>步数 = 预算 ÷ 实测单步</div></div>
+    </div>
+  </div>
+
+  <h3>并行可做的低风险项</h3>
+  <div class="grid2">
+    <div class="card">
+      <h4>档案补齐（不耗 GPU）</h4>
+      <ol class="tiny" style="margin-left:16px">
+        <li>跑一次 verify_dmodel_ceiling / diag_grid_source / eval_generalize 并存档输出</li>
+        <li>跑一次 diag_compose 用现有 40 步权重（哪怕读数很难看，留个基线）</li>
+        <li>核对 mix 模式实际采样分布（1/3:1/3:1/3 是设计值）</li>
+        <li>排查验证 loss inf @ step 0</li>
+        <li>清理 cond_prototypes.py 死代码</li>
+      </ol>
+    </div>
+    <div class="card">
+      <h4>待用户决策的 5 个开放问题</h4>
+      <ol class="tiny" style="margin-left:16px">
+        <li>条件分化若反复修不好，是否接受降级（v3700 画质 + CLIP 检索式生成）？</li>
+        <li>v3800/v3900/v4000 优先级仍按 B→A→C？v4100 插在哪里？</li>
+        <li>是否继续单样本微调路线，还是直接转 v4200？</li>
+        <li>C 盘清理是否批准（提交上限 36.7GB 隐形炸弹）？</li>
+        <li>是否接受重跑版 v2500 作为冻结基线（原始权重已丢失）？</li>
+      </ol>
+    </div>
+  </div>
+
+  <h3>工程纪律（13 条，全部从事故中得出）</h3>
+  <div class="card">
+    <ol class="tiny" style="margin-left:16px;columns:2;column-gap:32px">
+      <li>跑训练前先 py_compile（曾经训练结束后有人改脚本留半成品变量）</li>
+      <li>试跑必须带 OVERFIT_TAG（曾因无 tag 覆盖已训好 ckpt）</li>
+      <li>改 loss 先跑 150 步比同步数指标，方向错立刻终止</li>
+      <li>验收前先 ls 确认 overfit_ckpt_best.pt 存在</li>
+      <li>改 loss 变换必须同步改递推域 + μ 初值 + lr 倍率</li>
+      <li>诊断谱包络必须与 loss 聚合顺序一致（Jensen 陷阱）</li>
+      <li>加权方案必须先算权重分布（a_tar² 让 DC 独占 99.9%）</li>
+      <li>边界统计必须用平方能量（带符号误差正负相消）</li>
+      <li>numpy/torch import 前必须锁死线程数</li>
+      <li>批量产物必须先落 outputs 再分析（曾 150 步试跑覆盖 3000 步 ckpt）</li>
+      <li>preencode 启动即断言 GIF_ROOT.is_dir()，hit 率 &lt;50% 直接 SystemExit</li>
+      <li>np.save 临时名必须用 _tmp.npy 结尾（自动追加 .npy 陷阱）</li>
+      <li>所有 .cmd 批处理保持纯 ASCII（Windows cmd GBK 解析中文报错）</li>
+    </ol>
+  </div>
+
+  <p class="tiny" style="margin-top:20px">本工作台数据来源：AetherGIF-V1/Docs/技术文档/ 共 27 篇 101,047 字技术文档 · 17 个版本目录的源码与日志 · 2026-10-14 生成。</p>
+</section>
+
+</main>
+
+<script>
+// ===== Nav scroll spy =====
+const secs = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('nav a');
+window.addEventListener('scroll', () => {
+  let cur = '';
+  secs.forEach(s => { if (window.scrollY >= s.offsetTop - 72) cur = s.id; });
+  navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + cur));
+});
+
+// ===== 死穴筛选 =====
+document.querySelectorAll('.fbtn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.fbtn').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+    const f = btn.dataset.f;
+    document.querySelectorAll('#ptable tr[data-st]').forEach(tr => {
+      tr.style.display = (f === 'all' || tr.dataset.st === f) ? '' : 'none';
+    });
+  });
+});
+
+// ===== Meter 动画 =====
+const io = new IntersectionObserver(es => {
+  es.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.querySelectorAll('.fill').forEach(f => {
+        const w = f.style.width; f.style.width = '0';
+        requestAnimationFrame(() => requestAnimationFrame(() => f.style.width = w));
+      });
+      io.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.25 });
+document.querySelectorAll('.meter, .stat').forEach(el => io.observe(el));
+</script>
+</body>
+</html>

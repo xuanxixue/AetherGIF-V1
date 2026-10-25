@@ -1,0 +1,15 @@
+{
+ "cond": {
+  "mode": "无真实条件（占位文本向量）",
+  "dim": 0,
+  "item": "å°ç",
+  "detail": {}
+ },
+ "summary": {
+  "run_dir": "D:\\AetherGIF-V1\\viz\\runs\\v3600_1024_093551",
+  "gif": "D:\\AetherGIF-V1\\viz\\runs\\v3600_1024_093551\\final.gif",
+  "n_frames": 30,
+  "a_mean": 0.3697,
+  "sync": 0.0603
+ }
+}

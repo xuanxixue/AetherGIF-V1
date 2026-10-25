@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>AetherGIF 流式生成可视化</title>
+<style>
+  :root{
+    --bg:#0a0d14; --panel:#121826; --panel2:#0e1420;
+    --line:#22304a; --txt:#e6edf7; --dim:#8b9bb4;
+    --acc:#38e0c8; --acc2:#4b8dff; --warn:#ffb340; --bad:#ff6b6b; --good:#3ddc84;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--txt);font-family:"Segoe UI","Microsoft YaHei",sans-serif;
+       height:100vh;display:flex;flex-direction:column;overflow:hidden}
+  header{padding:12px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:16px;
+         background:linear-gradient(90deg,#0e1524,#0a0d14)}
+  header h1{font-size:17px;font-weight:600;letter-spacing:.5px}
+  header .sub{font-size:12px;color:var(--dim)}
+  #status{margin-left:auto;font-size:12px;padding:5px 12px;border-radius:20px;
+          background:#0f1a2b;border:1px solid var(--line);color:var(--dim)}
+  #status.run{color:var(--acc);border-color:#1d4a44}
+  #status.done{color:var(--good);border-color:#1d4a2c}
+  #status.err{color:var(--bad);border-color:#4a1d1d}
+
+  main{flex:1;display:grid;grid-template-columns:290px 1fr 310px;gap:12px;padding:12px;overflow:hidden}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px;overflow:hidden;
+         display:flex;flex-direction:column}
+  .panel h3{font-size:12px;color:var(--dim);font-weight:500;letter-spacing:1px;margin-bottom:10px;
+            text-transform:uppercase}
+
+  /* 左：条件 */
+  #vecimg{width:100%;border-radius:6px;border:1px solid var(--line);image-rendering:pixelated}
+  .kv{display:flex;justify-content:space-between;font-size:12.5px;padding:5px 0;border-bottom:1px dashed #1b2536}
+  .kv span:last-child{color:var(--acc);font-variant-numeric:tabular-nums}
+  .mode{font-size:12px;color:var(--warn);margin-bottom:8px}
+
+  /* 中：当前层 */
+  .stage-imgs{display:flex;flex-direction:column;gap:10px}
+  .imgbox{position:relative;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#05070c}
+  .imgbox img{width:100%;display:block;image-rendering:pixelated}
+  .imgbox .tag{position:absolute;left:8px;top:6px;font-size:11px;color:#9fb3d0;
+               background:rgba(5,8,12,.72);padding:2px 8px;border-radius:10px}
+  #curLayer{font-size:13px;color:var(--acc);margin-bottom:8px;font-weight:600}
+
+  /* 右：指标 + 能力 */
+  .metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+  .m{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px}
+  .m .lab{font-size:10.5px;color:var(--dim);letter-spacing:.5px}
+  .m .val{font-size:17px;font-weight:600;font-variant-numeric:tabular-nums;margin-top:2px}
+  .cap{font-size:12px;line-height:1.55}
+  .cap .row{display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px dashed #1b2536}
+  .cap .ic{width:16px;flex:0 0 16px;font-weight:700}
+  .ok{color:var(--good)} .no{color:var(--bad)} .part{color:var(--warn)}
+  .note{font-size:11px;color:var(--dim);line-height:1.5;margin-top:10px;
+        background:#0b1220;border-left:2px solid var(--warn);padding:7px 9px;border-radius:0 6px 6px 0}
+
+  /* 底：层网格 */
+  footer{padding:0 12px 12px;display:flex;flex-direction:column;gap:8px}
+  #grid{display:grid;grid-template-columns:repeat(13,1fr);gap:6px}
+  .cell{position:relative;border:1px solid var(--line);border-radius:6px;overflow:hidden;
+        background:#05070c;aspect-ratio:6/1;opacity:.28;transition:all .28s ease}
+  .cell img{width:100%;height:100%;object-fit:cover;display:block}
+  .cell.on{opacity:1;border-color:var(--acc);box-shadow:0 0 12px rgba(56,224,200,.30)}
+  .cell .n{position:absolute;left:3px;top:2px;font-size:9px;color:#cfe4ff;
+           background:rgba(0,0,0,.55);padding:0 4px;border-radius:6px}
+  #bar{height:3px;background:#141c2b;border-radius:2px;overflow:hidden}
+  #barIn{height:100%;width:0;background:linear-gradient(90deg,var(--acc2),var(--acc));transition:width .3s}
+  #log{height:56px;overflow:auto;font-family:Consolas,monospace;font-size:11px;color:#7f92ad;
+       background:#070a10;border:1px solid #16202f;border-radius:6px;padding:6px 8px;line-height:1.6}
+  #log div{white-space:nowrap}
+  #log .hi{color:var(--acc)}
+  button{background:#16233a;color:var(--txt);border:1px solid var(--line);border-radius:7px;
+         padding:7px 16px;font-size:12.5px;cursor:pointer;transition:.2s}
+  button:hover{background:#1d2c48;border-color:var(--acc2)}
+  button:disabled{opacity:.4;cursor:not-allowed}
+  button.mini{padding:4px 9px;font-size:11px;background:#0f1a2b;border-radius:5px}
+  .rowbtn{display:flex;gap:8px;align-items:center}
+  #dlwrap{display:none;margin-top:8px}
+</style>
+</head>
+<body>
+<header>
+  <h1 id="ttl">AetherGIF 流式生成可视化</h1>
+  <div class="sub" id="sub">物理振荡子场 · 逐层演化实时渲染</div>
+  <div id="status">待启动</div>
+</header>
+
+<main>
+  <section class="panel">
+    <h3>输入条件</h3>
+    <div class="mode" id="mode">—</div>
+    <img id="vecimg" style="display:none">
+    <div id="condkv"></div>
+    <div style="margin-top:auto;padding-top:12px">
+      <div id="textwrap" style="display:none;margin-bottom:10px">
+        <div style="font-size:11px;color:var(--dim);margin-bottom:5px">输入文本（留空则用素材自带条件）</div>
+        <input id="txtin" type="text" placeholder="例如：一个扎红色蝴蝶结的动漫少女"
+               style="width:100%;background:#0b1220;border:1px solid var(--line);border-radius:6px;
+                      color:var(--txt);padding:8px 10px;font-size:12.5px;outline:none">
+        <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">
+          <button class="mini" data-t="一张透明背景的台球&quot;8号球&quot;矢量图标：深灰黑色球体，左上方有一个白色圆形区域，白圈正中是黑色粗体无衬线数字&quot;8&quot;，球体左上角有高光、右下方有深色弧线阴影，整体呈扁平图标风格但有 3D 立体感">8号球</button>
+          <button class="mini" data-t="一张二次元Q版动漫表情包：黑色长直发少女，齐刘海，左侧头发绑红色蝴蝶结发带，闭着倒V字型&quot;^ ^&quot;的眼睛，脸颊泛红，双手举在头部两侧握拳挥舞">前辈前辈</button>
+        </div>
+      </div>
+      <div class="rowbtn">
+        <button id="go">开始流式生成</button>
+        <button id="dl" disabled>保存本次全部</button>
+      </div>
+      <div id="dlwrap"><a id="dlLink" style="font-size:11.5px;color:var(--acc)">↓ 下载图片包</a></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h3>当前演化状态</h3>
+    <div id="curLayer">等待开始…</div>
+    <div class="stage-imgs">
+      <div class="imgbox">
+        <span class="tag">完整生成结果（GIF 实时播放）</span>
+        <img id="gifview" alt="生成结果" style="width:100%;min-height:120px">
+      </div>
+      <div style="display:grid;grid-template-columns:1.6fr 1fr;gap:10px">
+        <div class="imgbox">
+          <span class="tag">当前演化帧（6 帧采样）</span>
+          <img id="curFrames" alt="">
+        </div>
+        <div class="imgbox">
+          <span class="tag">振幅能量</span>
+          <img id="curEnergy" alt="">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h3>实时指标</h3>
+    <div class="metrics">
+      <div class="m"><div class="lab">平均振幅</div><div class="val" id="mA">—</div></div>
+      <div class="m"><div class="lab">峰值振幅</div><div class="val" id="mX">—</div></div>
+      <div class="m"><div class="lab">相位同步度</div><div class="val" id="mS">—</div></div>
+      <div class="m"><div class="lab">目标一致性</div><div class="val" id="mW">—</div></div>
+    </div>
+    <h3>能力边界</h3>
+    <div class="cap" id="cap"></div>
+    <div class="note" id="note"></div>
+  </section>
+</main>
+
+<footer>
+  <div id="grid"></div>
+  <div id="bar"><div id="barIn"></div></div>
+  <div id="log"></div>
+</footer>
+
+<script>
+const CFG = __CONFIG__;
+const ENC = 'http://127.0.0.1:8103';   // 独立文本编码服务
+const $ = id => document.getElementById(id);
+document.getElementById('ttl').textContent = CFG.title;
+
+// 能力标注（诚实版）
+const CAP = CFG.has_cond ? {
+  rows: [
+    ['ok','结构生成','轮廓、位置、运动轨迹能出来'],
+    ['part','特征向量生成','文本+首帧+视频三路条件已接通，但仅 2 个素材训练'],
+    ['no','泛化能力','未见过的素材/描述无法组合出新内容'],
+    ['no','颜色准确度','饱和度与素材仍有偏差（w=16 频点正在攻）']
+  ],
+  note: '本模型为条件生成验证阶段：条件通路已打通，但训练样本仅 2 个，不能外推。'
+} : {
+  rows: [
+    ['ok','结构生成','轮廓、位置、运动轨迹能出来'],
+    ['no','特征向量生成','无文本/图像条件输入（占位向量）'],
+    ['no','泛化能力','单一结构原型，无跨样本泛化'],
+    ['no','颜色准确度','以亮度结构为主，颜色未建模']
+  ],
+  note: '本模型是物理架构的最小验证体：只证明振子场能表达时空结构，不具备条件控制。'
+};
+$('cap').innerHTML = CAP.rows.map(([c,t,d]) =>
+  `<div class="row"><span class="ic ${c}">${c==='ok'?'✓':(c==='part'?'◐':'✕')}</span>
+   <span><b>${t}</b><br><span style="color:#8b9bb4;font-size:11px">${d}</span></span></div>`).join('');
+$('note').textContent = CAP.note;
+
+// 13 格：init + 12 层
+const NCELLS = 13;
+for (let i=0;i<NCELLS;i++){
+  const d = document.createElement('div');
+  d.className='cell'; d.id='c'+i;
+  d.innerHTML = `<div class="n">${i===0?'INIT':'L'+(i-1)}</div><img id="ci${i}">`;
+  $('grid').appendChild(d);
+}
+
+let saved = [], nLayer = 0, es = null;
+
+// 有条件的模型才显示文本框
+if (CFG.has_cond){
+  $('textwrap').style.display = 'block';
+  document.querySelectorAll('button.mini').forEach(b=>{
+    b.onclick = () => { $('txtin').value = b.dataset.t; };
+  });
+}
+
+function log(msg, hi){
+  const d = document.createElement('div');
+  if(hi) d.className='hi';
+  d.textContent = '[' + new Date().toLocaleTimeString('zh-CN',{hour12:false}) + '] ' + msg;
+  $('log').appendChild(d); $('log').scrollTop = 1e9;
+}
+function setStatus(t, cls){ $('status').textContent = t; $('status').className = cls||''; }
+
+$('go').onclick = async () => {
+  if (es) es.close();
+  saved = []; nLayer = 0;
+  for (let i=0;i<NCELLS;i++){ $('c'+i).classList.remove('on'); $('ci'+i).src=''; }
+  $('barIn').style.width = '0%';
+  $('log').innerHTML = '';
+  $('dl').disabled = true; $('dlwrap').style.display='none';
+  $('gifview').removeAttribute('src');
+  $('go').disabled = true;
+  setStatus('准备中…','run');
+  log('连接推理流…', true);
+
+  const tin = $('txtin') ? $('txtin').value.trim() : '';
+  let token = '';
+
+  // ★ 分离架构：先把「文本 → 向量」这一步做完（独立编码服务 + 独立显存占用），
+  //   再让生成模型上场。这样 4GB 卡不会两边抢显存。
+  if (CFG.has_cond && tin){
+    try {
+      setStatus('编码文本中…','run');
+      log('调用编码服务（INT8 Qwen）…', true);
+      const t0 = performance.now();
+      const r = await fetch(ENC + '/encode?text=' + encodeURIComponent(tin));
+      const d = await r.json();
+      if (!d.ok) throw new Error(d.msg || '编码失败');
+      if (d.img){ $('vecimg').src = d.img; $('vecimg').style.display='block'; }
+      $('mode').textContent = '用户输入文本 → ' + d.dim + ' 维向量';
+      $('condkv').innerHTML =
+        `<div class="kv"><span>向量 L2</span><span>${d.norm}</span></div>` +
+        `<div class="kv"><span>文本向量 L2</span><span>${d.text_norm}</span></div>` +
+        `<div class="kv"><span>编码耗时</span><span>${d.ms} ms</span></div>`;
+      log(`编码完成 ${d.ms}ms，向量模长 ${d.norm}`, true);
+
+      const r2 = await fetch('/set_vec', {method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({vec_b64: d.vec_b64})});
+      const d2 = await r2.json();
+      if (!d2.ok) throw new Error(d2.msg || '向量注册失败');
+      token = d2.token;
+      log('向量已交给生成模型', true);
+    } catch(e){
+      setStatus('编码失败','err'); log('编码失败：'+e.message);
+      $('go').disabled = false; return;
+    }
+  }
+
+  const q = new URLSearchParams({src:'0', seed:'1234'});
+  if (token) q.set('token', token);
+  else if (tin) q.set('text', tin);
+
+  es = new EventSource('/stream?' + q.toString());
+  es.onmessage = ev => {
+    const d = JSON.parse(ev.data);
+    if (d.stage === 'load'){
+      log(`权重 ${d.ckpt}  missing=${d.missing}  params=${d.params.toLocaleString()}  device=${d.device}`);
+    }
+    else if (d.stage === 'encoding'){
+      setStatus('编码文本中…','run'); log(d.msg, true);
+    }
+    else if (d.stage === 'cond'){
+      $('mode').textContent = d.cond.mode + (d.cond.dim ? `（${d.cond.dim} 维）` : '');
+      if (d.vec_img){ $('vecimg').src = d.vec_img; $('vecimg').style.display='block'; }
+      const kv = Object.entries(d.cond.detail||{}).map(([k,v])=>
+        `<div class="kv"><span>${k}向量 L2</span><span>${v}</span></div>`).join('');
+      $('condkv').innerHTML = kv + (d.cond.item?
+        `<div class="kv"><span>素材</span><span style="font-size:11px">${d.cond.item}</span></div>`:'');
+      log(`条件就绪：${d.cond.mode}`, true);
+    }
+    else if (d.stage === 'layer'){
+      const i = d.idx < 0 ? 0 : d.idx + 1;
+      $('ci'+i).src = d.energy; $('c'+i).classList.add('on');
+      $('curFrames').src = d.frames;
+      $('curEnergy').src = d.energy;
+      $('curLayer').textContent = d.idx < 0 ? '初始振子场（条件注入后，未演化）'
+                                            : `物理块 ${d.idx+1} / 12 演化完成`;
+      $('mA').textContent = d.metrics.a_mean.toFixed(4);
+      $('mX').textContent = d.metrics.a_max.toFixed(3);
+      $('mS').textContent = d.metrics.sync.toFixed(4);
+      $('mW').textContent = d.metrics.wcos===null ? '—' : d.metrics.wcos.toFixed(4);
+      $('barIn').style.width = ((i)/NCELLS*100).toFixed(1)+'%';
+      saved.push({name:d.name, frames:d.frames, energy:d.energy});
+      log(`${d.name}  a_mean=${d.metrics.a_mean}  sync=${d.metrics.sync}` +
+          (d.metrics.wcos!==null?`  wcos=${d.metrics.wcos}`:''));
+    }
+    else if (d.stage === 'final'){
+      $('barIn').style.width = '100%';
+      $('curFrames').src = d.final;
+      if (d.target){ $('curEnergy').src = d.target; }
+      // ★ 完整 GIF 播放区
+      if (d.gif_url){ $('gifview').src = d.gif_url + '?t=' + Date.now(); }
+      $('curLayer').textContent = '生成完成 · FFT 解码输出';
+      setStatus('完成','done');
+      log(`完成：${d.summary.n_frames} 帧，产物 ${d.summary.run_dir}`, true);
+      $('go').disabled = false;
+      $('dl').disabled = false;
+      es.close(); es = null;
+    }
+    else if (d.stage === 'error'){
+      setStatus('错误','err'); log('错误：'+d.msg); $('go').disabled=false; es.close(); es=null;
+    }
+  };
+  es.onerror = () => { setStatus('连接中断','err'); log('SSE 连接中断'); $('go').disabled=false; };
+};
+
+// 保存本次全部渲染结果（前端侧，后端同时也落盘了）
+$('dl').onclick = async () => {
+  const items = saved.concat([{name:'final', frames:$('curFrames').src}]);
+  for (let i=0;i<items.length;i++){
+    const a = document.createElement('a');
+    a.href = items[i].frames;
+    a.download = `${CFG.model}_${String(i).padStart(2,'0')}_${items[i].name}_frames.png`;
+    a.click();
+    await new Promise(r=>setTimeout(r,180));
+  }
+  log(`已导出 ${items.length} 张渲染结果到下载目录`, true);
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+[MEM:启动] RAM 可用 4.32GB (load 72%) | 提交剩余 13.54GB/36.7GB
+==============================================================================
+[CFG] v4200 多模态训练  预算上限=7.0天(604800s, 实际训 6天15:36:00)
+[CFG] mode=mix batch=4 acc=1 workers=8 compile=False
+[CFG] lr: 3e-05 →(warmup 300)→ 0.0003 →(cosine)→ 1e-05
+[CFG] 能力: 文生GIF / 图生GIF / 图文生GIF  (mode=mix)
+[CFG] 早停: 每 250 步检查 | patience=5 | min_steps=300 | val=8.0%
+[CFG] ★ 早停已禁用（--no-early-stop），会跑满预算
+==============================================================================
+[SPLIT] group 级隔离: 204 组 → 训练 200 条 / 验证 48 条
+[SPLIT] 验证集独占 16 个 group，与训练集 group 重叠 0 个 → ✓ 无泄漏
+[DATA] 14145 个 GIF | 204 group | 图像特征有效 14145 | mode=mix
+[DATA] 本实例实际使用 200 条（显式子集，require_image=False）
+[DATA] 14145 个 GIF | 204 group | 图像特征有效 14145 | mode=both
+[DATA] 本实例实际使用 48 条（显式子集，require_image=False）
+[INFO] AetherGIFModel 初始化完成：d_model=125, n_blocks=12, 参数量 = 3,860,826
+[PARAM] 3,860,826 参数  N=6144
+Traceback (most recent call last):
+  File "D:\AetherGIF-V1\docx\实验记录\versions\v4200_多模态CLIP产品版\scripts\train_multimodal.py", line 1022, in <module>
+    main()
+  File "D:\AetherGIF-V1\docx\实验记录\versions\v4200_多模态CLIP产品版\scripts\train_multimodal.py", line 810, in main
+    rate = measure_rate(args.bench)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AetherGIF-V1\docx\实验记录\versions\v4200_多模态CLIP产品版\scripts\train_multimodal.py", line 796, in measure_rate
+    a, th, _ = model(texts=None, target_field=field, t_coord=t_coord,
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python312\Lib\site-packages\torch\nn\modules\module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python312\Lib\site-packages\torch\nn\modules\module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AetherGIF-V1\docx\实验记录\versions\v4200_多模态CLIP产品版\src\model\aether_gif_model.py", line 248, in forward
+    a, theta, d = self.pmnncore.blocks[i](
+                  ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python312\Lib\site-packages\torch\nn\modules\module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python312\Lib\site-packages\torch\nn\modules\module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AetherGIF-V1\docx\实验记录\versions\v4200_多模态CLIP产品版\src\physics\block.py", line 103, in forward
+    g = self.drift(a, theta, targets)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python312\Lib\site-packages\torch\nn\modules\module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python312\Lib\site-packages\torch\nn\modules\module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AetherGIF-V1\docx\实验记录\versions\v4200_多模态CLIP产品版\src\physics\drift_field.py", line 241, in forward
+    g = g + checkpoint(self._attract_phase, z, tar, theta, theta_tar,
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python312\Lib\site-packages\torch\_compile.py", line 32, in inner
+    return disable_fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python312\Lib\site-packages\torch\_dynamo\eval_frame.py", line 632, in _fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Python312\Lib\site-packages\torch\utils\checkpoint.py", line 496, in checkpoint
+    ret = function(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AetherGIF-V1\docx\实验记录\versions\v4200_多模态CLIP产品版\src\physics\drift_field.py", line 203, in _attract_phase
+    return softmax_kernel_phase(z, tar, theta, theta_tar, tau_s, chunk=self.chunk)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AetherGIF-V1\docx\实验记录\versions\v4200_多模态CLIP产品版\src\physics\drift_field.py", line 137, in softmax_kernel_phase
+    l = _pairwise_logits(x_sq, y_sq[:, cs:ce], xn, yn[:, cs:ce], tau)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\AetherGIF-V1\docx\实验记录\versions\v4200_多模态CLIP产品版\src\physics\drift_field.py", line 36, in _pairwise_logits
+    return -(x_sq.unsqueeze(2) + y_sq.unsqueeze(1) - 2.0 * cross) / tau
+                                                     ~~~~^~~~~~~
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 192.00 MiB. GPU 0 has a total capacity of 4.00 GiB of which 0 bytes is free. Of the allocated memory 6.89 GiB is allocated by PyTorch, and 285.76 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)

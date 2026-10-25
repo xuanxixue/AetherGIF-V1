@@ -1,0 +1,17 @@
+[MEM:启动] RAM 可用 5.60GB (load 64%) | 提交剩余 14.07GB/36.9GB
+==============================================================================
+[CFG] v4200 多模态训练  预算上限=7.0天(604800s, 实际训 6天15:36:00)
+[CFG] mode=mix batch=4 acc=1 workers=8 compile=False
+[CFG] lr: 3e-05 →(warmup 300)→ 0.0003 →(cosine)→ 1e-05
+[CFG] 能力: 文生GIF / 图生GIF / 图文生GIF  (mode=mix)
+[CFG] 早停: 每 250 步检查 | patience=5 | min_steps=300 | val=8.0%
+[CFG] ★ 早停已禁用（--no-early-stop），会跑满预算
+==============================================================================
+[SPLIT] group 级隔离: 204 组 → 训练 64 条 / 验证 48 条
+[SPLIT] 验证集独占 16 个 group，与训练集 group 重叠 0 个 → ✓ 无泄漏
+[DATA] 14145 个 GIF | 204 group | 图像特征有效 14145 | mode=mix
+[DATA] 本实例实际使用 64 条（显式子集，require_image=False）
+[DATA] 14145 个 GIF | 204 group | 图像特征有效 14145 | mode=both
+[DATA] 本实例实际使用 48 条（显式子集，require_image=False）
+[INFO] AetherGIFModel 初始化完成：d_model=125, n_blocks=12, 参数量 = 3,860,826
+[PARAM] 3,860,826 参数  N=6144

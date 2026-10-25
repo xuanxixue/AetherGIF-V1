@@ -1,0 +1,19 @@
+{
+ "cond": {
+  "mode": "三路条件向量",
+  "dim": 6147,
+  "item": "01_8ball.gif",
+  "detail": {
+   "文本": 0.998,
+   "首帧": 1.0,
+   "视频": 1.0
+  }
+ },
+ "summary": {
+  "run_dir": "D:\\AetherGIF-V1\\viz\\runs\\v4200_1024_093426",
+  "gif": "D:\\AetherGIF-V1\\viz\\runs\\v4200_1024_093426\\final.gif",
+  "n_frames": 30,
+  "a_mean": 0.162,
+  "sync": 0.4666
+ }
+}

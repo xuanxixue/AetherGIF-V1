@@ -1,0 +1,19 @@
+{
+ "cond": {
+  "mode": "三路条件向量",
+  "dim": 6147,
+  "item": "02_senpai.gif",
+  "detail": {
+   "文本": 0.999,
+   "首帧": 0.998,
+   "视频": 0.998
+  }
+ },
+ "summary": {
+  "run_dir": "D:\\AetherGIF-V1\\viz\\runs\\v4200_1024_095620",
+  "gif": "D:\\AetherGIF-V1\\viz\\runs\\v4200_1024_095620\\final.gif",
+  "n_frames": 30,
+  "a_mean": 0.3812,
+  "sync": 0.2166
+ }
+}

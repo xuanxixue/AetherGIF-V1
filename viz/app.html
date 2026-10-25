@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>AetherGIF · 物理振荡子场生成演示</title>
+<style>
+  :root{--bg:#0a0d14;--panel:#111825;--panel2:#0d1420;--line:#22304a;--txt:#e6edf7;
+        --dim:#8b9bb4;--acc:#38e0c8;--acc2:#4b8dff;--warn:#ffb340;--bad:#ff6b6b;--good:#3ddc84}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--txt);font-family:"Segoe UI","Microsoft YaHei",sans-serif;
+       height:100vh;display:flex;flex-direction:column;overflow:hidden;font-size:13px}
+  header{padding:9px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;
+         background:linear-gradient(90deg,#0e1524,#0a0d14);flex:0 0 auto}
+  header h1{font-size:15px;font-weight:600}
+  .wsel{display:flex;gap:6px;margin-left:6px}
+  .wbtn{padding:5px 12px;border-radius:6px;border:1px solid var(--line);background:#121b2b;
+        cursor:pointer;font-size:12px;transition:.18s;color:var(--txt)}
+  .wbtn:hover{border-color:var(--acc2)}
+  .wbtn.on{background:#0f2a26;border-color:var(--acc);color:var(--acc);font-weight:600}
+  #status{margin-left:auto;font-size:11.5px;padding:4px 11px;border-radius:14px;
+          background:#0f1a2b;border:1px solid var(--line);color:var(--dim)}
+  #status.run{color:var(--acc);border-color:#1d4a44}
+  #status.done{color:var(--good);border-color:#1d4a2c}
+  #status.err{color:var(--bad);border-color:#4a1d1d}
+
+  main{flex:1;display:grid;grid-template-columns:288px 1fr 330px;gap:9px;padding:9px;
+       overflow:hidden;min-height:0}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:10px;
+         display:flex;flex-direction:column;min-height:0;overflow:hidden}
+  .panel h3{font-size:10.5px;color:var(--dim);font-weight:600;letter-spacing:1.1px;
+            margin-bottom:7px;text-transform:uppercase;flex:0 0 auto}
+
+  /* 左栏 */
+  .modes{display:flex;flex-direction:column;gap:5px;margin-bottom:9px}
+  .mbtn{padding:6px 9px;border-radius:6px;border:1px solid var(--line);background:var(--panel2);
+        cursor:pointer;font-size:12px;text-align:left;color:var(--txt);transition:.16s}
+  .mbtn:hover{border-color:var(--acc2)}
+  .mbtn.on{background:#0f2a26;border-color:var(--acc);color:var(--acc)}
+  .mbtn:disabled{opacity:.32;cursor:not-allowed}
+  .sub{font-size:10px;color:var(--dim);margin:2px 0 4px}
+  .chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+  .chip{padding:4px 9px;border-radius:14px;border:1px solid var(--line);background:var(--panel2);
+        font-size:11px;cursor:pointer;transition:.16s;color:var(--txt)}
+  .chip:hover{border-color:var(--acc2)}
+  .chip.on{background:#0f2a26;border-color:var(--acc);color:var(--acc)}
+  .thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:8px}
+  .tb{position:relative;border:1px solid var(--line);border-radius:6px;overflow:hidden;
+      cursor:pointer;aspect-ratio:1;transition:.16s;background:#05070c}
+  .tb img{width:100%;height:100%;object-fit:cover;display:block;opacity:.72}
+  .tb.on{border-color:var(--acc);box-shadow:0 0 8px rgba(56,224,200,.35)}
+  .tb.on img{opacity:1}
+  .tb span{position:absolute;left:0;right:0;bottom:0;font-size:9px;text-align:center;
+           background:rgba(0,0,0,.62);padding:1px 0}
+  textarea{width:100%;height:58px;background:#080d16;border:1px solid var(--line);border-radius:6px;
+           color:var(--txt);padding:6px 8px;font-size:11.5px;resize:none;outline:none;line-height:1.4}
+  textarea:focus{border-color:var(--acc2)}
+  .act{display:flex;gap:6px;margin-top:auto;padding-top:8px}
+  .act button{flex:1;padding:7px;border-radius:6px;border:1px solid var(--line);background:#16233a;
+              color:var(--txt);cursor:pointer;font-size:12px;transition:.16s}
+  .act button:hover{background:#1d2c48;border-color:var(--acc2)}
+  .act button:disabled{opacity:.4;cursor:not-allowed}
+  .act button.primary{background:#123c35;border-color:#1d5c50;color:var(--acc)}
+
+  /* 中栏：GIF 固定小尺寸 */
+  .stage{display:grid;grid-template-rows:auto auto 1fr;gap:8px;min-height:0}
+  .gifwrap{display:flex;gap:10px;align-items:flex-start}
+  .gifbox{width:240px;height:240px;flex:0 0 240px;border:1px solid var(--line);border-radius:8px;
+          overflow:hidden;background:#05070c;display:flex;align-items:center;justify-content:center}
+  .gifbox img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+  .gifmeta{flex:1;min-width:0}
+  .kv{display:flex;justify-content:space-between;font-size:11.5px;padding:3px 0;
+      border-bottom:1px dashed #1b2536;gap:8px}
+  .kv span:last-child{color:var(--acc);font-variant-numeric:tabular-nums;
+                      overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pairs{display:grid;grid-template-columns:1fr 1fr;gap:8px;min-height:0}
+  .imgbox{position:relative;border:1px solid var(--line);border-radius:7px;overflow:hidden;
+          background:#05070c;display:flex;align-items:center;justify-content:center;min-height:0}
+  .imgbox img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+  .imgbox .tag{position:absolute;left:6px;top:4px;font-size:10px;color:#9fb3d0;
+               background:rgba(5,8,12,.74);padding:1px 7px;border-radius:9px}
+
+  /* 右栏 */
+  .metrics{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:9px;flex:0 0 auto}
+  .m{background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:6px 8px}
+  .m .lab{font-size:9.5px;color:var(--dim)}
+  .m .val{font-size:15px;font-weight:600;font-variant-numeric:tabular-nums}
+  .flaws{flex:1;overflow:auto;min-height:0}
+  .flaw{display:flex;gap:7px;padding:5px 0;border-bottom:1px dashed #1b2536;font-size:11.5px;
+        line-height:1.5}
+  .flaw .ic{flex:0 0 14px;font-weight:700}
+  .cap{font-size:11.5px;line-height:1.5;margin-bottom:9px;flex:0 0 auto}
+  .cap .row{display:flex;gap:7px;padding:4px 0;border-bottom:1px dashed #1b2536}
+  .ok{color:var(--good)}.no{color:var(--bad)}.part{color:var(--warn)}
+
+  footer{flex:0 0 auto;padding:0 9px 9px;display:flex;flex-direction:column;gap:6px}
+  #grid{display:grid;grid-template-columns:repeat(13,1fr);gap:5px}
+  .cell{position:relative;border:1px solid var(--line);border-radius:5px;overflow:hidden;
+        background:#05070c;aspect-ratio:6/1;opacity:.26;transition:.26s}
+  .cell img{width:100%;height:100%;object-fit:cover;display:block}
+  .cell.on{opacity:1;border-color:var(--acc);box-shadow:0 0 9px rgba(56,224,200,.30)}
+  .cell .n{position:absolute;left:2px;top:1px;font-size:8px;color:#cfe4ff;
+           background:rgba(0,0,0,.6);padding:0 3px;border-radius:5px}
+  #bar{height:3px;background:#141c2b;border-radius:2px;overflow:hidden}
+  #barIn{height:100%;width:0;background:linear-gradient(90deg,var(--acc2),var(--acc));transition:width .3s}
+  #log{height:44px;overflow:auto;font-family:Consolas,monospace;font-size:10.5px;color:#7f92ad;
+       background:#070a10;border:1px solid #16202f;border-radius:5px;padding:4px 7px;line-height:1.55}
+  #log .hi{color:var(--acc)}
+</style>
+</head>
+<body>
+<header>
+  <h1>AetherGIF</h1>
+  <div class="wsel" id="wsel"></div>
+  <div id="status">就绪</div>
+</header>
+
+<main>
+  <!-- 左：输入 -->
+  <section class="panel">
+    <h3>生成模式</h3>
+    <div class="modes" id="modes"></div>
+
+    <h3>文本预设（点击填入）</h3>
+    <div class="chips" id="chips"></div>
+
+    <h3>图片预设（点击选择）</h3>
+    <div class="thumbs" id="thumbs"></div>
+
+    <h3>文本内容</h3>
+    <textarea id="txtin" placeholder="选择预设或自己写…"></textarea>
+
+    <div class="act">
+      <button id="go" class="primary">开始生成</button>
+      <button id="unload">卸载显存</button>
+    </div>
+  </section>
+
+  <!-- 中：结果 -->
+  <section class="panel stage">
+    <h3>生成结果</h3>
+    <div class="gifwrap">
+      <div class="gifbox"><img id="gifview" alt="等待生成"></div>
+      <div class="gifmeta" id="gifmeta">
+        <div class="kv"><span>当前权重</span><span id="kV">—</span></div>
+        <div class="kv"><span>条件模式</span><span id="kM">—</span></div>
+        <div class="kv"><span>帧数 / 尺寸</span><span>30 帧 / 128×128</span></div>
+        <div class="kv"><span>产物目录</span><span id="kD">—</span></div>
+      </div>
+    </div>
+    <div class="pairs">
+      <div class="imgbox"><span class="tag">当前物理块解码帧</span><img id="curFrames"></div>
+      <div class="imgbox"><span class="tag">振幅能量分布</span><img id="curEnergy"></div>
+    </div>
+    <div style="flex:1;min-height:0"></div>
+  </section>
+
+  <!-- 右：指标 + 能力 + 缺陷 -->
+  <section class="panel">
+    <h3>实时指标</h3>
+    <div class="metrics">
+      <div class="m"><div class="lab">平均振幅</div><div class="val" id="mA">—</div></div>
+      <div class="m"><div class="lab">峰值振幅</div><div class="val" id="mX">—</div></div>
+      <div class="m"><div class="lab">相位同步度</div><div class="val" id="mS">—</div></div>
+      <div class="m"><div class="lab">目标一致性</div><div class="val" id="mW">—</div></div>
+    </div>
+    <h3>能力边界</h3>
+    <div class="cap" id="cap"></div>
+    <h3>已知缺陷（不回避）</h3>
+    <div class="flaws" id="flaws"></div>
+  </section>
+</main>
+
+<footer>
+  <div id="grid"></div>
+  <div id="bar"><div id="barIn"></div></div>
+  <div id="log"></div>
+</footer>
+
+<script>
+const $ = id => document.getElementById(id);
+// ★ 两套模型的文本维度不同（896 vs 2048），无法同进程共存，所以后端分两个端口。
+//   前端保持「一个页面」，切换权重时自动卸载另一端，保证 4GB 卡只装一个模型。
+const ALL_W = [
+  {id:'v4200_s1800', label:'v4200 · 条件生成 1800 步', kind:'v4200', port:8100,
+   note:'2 素材 guidance 全量训练，轮廓最清晰'},
+  {id:'v4200_600',   label:'v4200 · 22 素材 600 步', kind:'v4200', port:8100,
+   note:'22 素材泛化尝试 + 判别损失'},
+  {id:'v3600',       label:'v3600 · 结构模型 D125', kind:'v3600', port:8101,
+   note:'无文本/图像条件；演示给定目标场的物理重建'}
+];
+const baseOf = w => 'http://127.0.0.1:' + (ALL_W.find(x=>x.id===w)||{}).port;
+const otherBase = w => (ALL_W.find(x=>x.id===w).kind === 'v3600')
+   ? 'http://127.0.0.1:8100' : 'http://127.0.0.1:8101';
+let P = null, curW = 'v4200_s1800', curMode = 't2v', curImg = '', es = null, saved = [];
+
+function log(m, hi){
+  const d = document.createElement('div'); if (hi) d.className='hi';
+  d.textContent = '[' + new Date().toLocaleTimeString('zh-CN',{hour12:false}) + '] ' + m;
+  $('log').appendChild(d); $('log').scrollTop = 1e9;
+}
+function setStatus(t,c){ $('status').textContent=t; $('status').className=c||''; }
+
+const FLAWS = [
+  ['颜色偏差','饱和度仅达素材 30~60%，颜色集中在 w=16 单个频点，正在专项攻坚'],
+  ['结构模糊','中高频细节缺失，输出呈噪点状；低频布局正确'],
+  ['泛化不足','22 个素材训练出现模式坍塌，不同条件输出趋同'],
+  ['样本极少','核心验证仅 2 个素材，不能外推新概念'],
+  ['分辨率','128×128 / 30 帧，尚未做高分辨率'],
+  ['耗时','单次生成约 20~40 秒（含显存切换）']
+];
+$('flaws').innerHTML = FLAWS.map(([t,d])=>
+  `<div class="flaw"><span class="ic no">!</span><span><b>${t}</b>：${d}</span></div>`).join('');
+
+async function boot(){
+  P = await (await fetch('http://127.0.0.1:8100/presets')).json();
+  $('wsel').innerHTML = ALL_W.map(w=>
+    `<button class="wbtn ${w.id===curW?'on':''}" data-w="${w.id}" title="${w.note}">${w.label}</button>`).join('');
+  $('wsel').querySelectorAll('.wbtn').forEach(b=> b.onclick = () => pickWeight(b.dataset.w));
+  $('modes').innerHTML = P.modes.map(m=>
+    `<button class="mbtn ${m.id==='t2v'?'on':''}" data-m="${m.id}">${m.label}</button>`).join('');
+  $('modes').querySelectorAll('.mbtn').forEach(b=> b.onclick = () => pickMode(b.dataset.m));
+  $('chips').innerHTML = P.texts.map(t=>
+    `<div class="chip" data-t="${t.id}">${t.label}</div>`).join('');
+  $('chips').querySelectorAll('.chip').forEach(c=> c.onclick = () => {
+    $('txtin').value = P.texts.find(x=>x.id===c.dataset.t).text;
+    log('已填入预设文本：' + c.textContent, true);
+  });
+  $('thumbs').innerHTML = P.images.map(i=>
+    `<div class="tb" data-i="${i.id}"><img src="${i.thumb}"><span>${i.label}</span></div>`).join('');
+  $('thumbs').querySelectorAll('.tb').forEach(t=> t.onclick = () => {
+    curImg = t.dataset.i;
+    $('thumbs').querySelectorAll('.tb').forEach(x=>x.classList.remove('on'));
+    t.classList.add('on');
+    log('已选择图片：' + t.querySelector('span').textContent, true);
+  });
+  $('kV').textContent = ALL_W.find(w=>w.id===curW).label;
+  syncModeAvailability();
+  buildGrid();
+  log('演示服务就绪，可选权重 ' + P.weights.length + ' 个', true);
+}
+
+async function pickWeight(w){
+  if (w === curW) return;
+  const from = curW, to = w;
+  curW = w;
+  // 先把另一端（即将不用的那套模型）显存卸掉，再让本端加载
+  if (ALL_W.find(x=>x.id===from).kind !== ALL_W.find(x=>x.id===to).kind){
+    try{ await fetch(otherBase(to) + '/unload'); log('已卸载另一套模型，释放显存', true); }
+    catch(e){ log('另一端卸载失败（可能未启动）：'+e.message); }
+  }
+  $('wsel').querySelectorAll('.wbtn').forEach(b=> b.classList.toggle('on', b.dataset.w===w));
+  const cfg = ALL_W.find(x=>x.id===w);
+  $('kV').textContent = cfg.label;
+  setStatus('已切换权重，生成时自动加载','');
+  log(`切换权重 → ${cfg.label}（旧的会先卸载）`, true);
+  syncModeAvailability();
+}
+
+function pickMode(m){
+  curMode = m;
+  $('modes').querySelectorAll('.mbtn').forEach(b=> b.classList.toggle('on', b.dataset.m===m));
+  log('模式：' + ({t2v:'文生',i2v:'图生',both:'图文生'})[m]);
+}
+
+function syncModeAvailability(){
+  const isV3600 = ALL_W.find(x=>x.id===curW).kind === 'v3600';
+  $('modes').querySelectorAll('.mbtn').forEach(b=>{
+    b.disabled = isV3600;
+    if (isV3600) b.classList.remove('on');
+  });
+  if (isV3600){
+    $('modes').querySelectorAll('.mbtn').forEach(b=>{
+      b.textContent = '物理重建（该权重固定模式）';
+    });
+    $('modes').firstElementChild.classList.add('on');
+  } else {
+    P.modes.forEach((m,i)=>{ $('modes').children[i].textContent = m.label; });
+  }
+  curMode = isV3600 ? 'rebuild' : 't2v';
+  if (!isV3600) $('modes').querySelectorAll('.mbtn').forEach(b=>
+    b.classList.toggle('on', b.dataset.m==='t2v'));
+}
+
+function buildGrid(){
+  for (let i=0;i<13;i++){
+    const d=document.createElement('div'); d.className='cell'; d.id='c'+i;
+    d.innerHTML=`<div class="n">${i===0?'INIT':'L'+(i-1)}</div><img id="ci${i}">`;
+    $('grid').appendChild(d);
+  }
+}
+
+const CAP_BASE = [
+  ['ok','结构生成','轮廓、位置、运动轨迹可生成'],
+];
+const CAP_V4200 = [
+  ['ok','结构生成','轮廓、位置、运动轨迹可生成'],
+  ['part','特征条件生成','文本/图片/图文三路已接通'],
+  ['no','泛化能力','未见过的概念无法组合出新内容'],
+  ['no','颜色准确度','饱和度仍显著低于素材']
+];
+const CAP_V3600 = [
+  ['ok','结构重建','给定目标场可高保真重建（PSNR 高）'],
+  ['no','条件生成','无文本/图像条件输入'],
+  ['no','泛化能力','单一结构原型，无跨样本泛化'],
+  ['no','颜色建模','以结构为主，颜色未建模']
+];
+
+$('go').onclick = async () => {
+  if (es) es.close();
+  saved = []; for (let i=0;i<13;i++){ $('c'+i).classList.remove('on'); $('ci'+i).src=''; }
+  $('barIn').style.width='0%'; $('log').innerHTML='';
+  $('gifview').removeAttribute('src');
+  $('go').disabled = true; setStatus('准备中…','run');
+  $('cap').innerHTML = (ALL_W.find(x=>x.id===curW).kind==='v3600'?CAP_V3600:CAP_V4200)
+    .map(([c,t,d])=>`<div class="row"><span class="ic ${c}">${c==='ok'?'✓':(c==='part'?'◐':'✕')}</span>
+      <span><b>${t}</b><br><span style="color:#8b9bb4;font-size:10.5px">${d}</span></span></div>`).join('');
+
+  const q = new URLSearchParams({w:curW, mode:curMode, seed:'1234'});
+  if (curMode==='t2v'||curMode==='both') q.set('text', $('txtin').value.trim());
+  if (curMode==='i2v'||curMode==='both') q.set('img', curImg);
+
+  log('连接推理流…', true);
+  es = new EventSource(baseOf(curW) + '/stream?' + q.toString());
+  es.onmessage = ev => {
+    const d = JSON.parse(ev.data);
+    if (d.stage==='status'){ setStatus(d.msg,'run'); log(d.msg,true); }
+    else if (d.stage==='layer'){
+      const i = d.idx<0?0:d.idx+1;
+      $('ci'+i).src=d.energy; $('c'+i).classList.add('on');
+      $('curFrames').src=d.frames; $('curEnergy').src=d.energy;
+      $('mA').textContent=d.metrics.a_mean.toFixed(4);
+      $('mX').textContent=d.metrics.a_max.toFixed(3);
+      $('mS').textContent=d.metrics.sync.toFixed(4);
+      $('mW').textContent=d.metrics.wcos===null?'—':d.metrics.wcos.toFixed(4);
+      $('barIn').style.width=((i+1)/13*100).toFixed(1)+'%';
+      saved.push(d);
+      log(`${d.name}  a=${d.metrics.a_mean}  sync=${d.metrics.sync}` +
+          (d.metrics.wcos!==null?`  wcos=${d.metrics.wcos}`:''));
+    }
+    else if (d.stage==='final'){
+      $('barIn').style.width='100%';
+      if (d.gif_url) $('gifview').src = d.gif_url + '?t=' + Date.now();
+      $('kM').textContent = d.cond ? d.cond.mode : '—';
+      $('kD').textContent = d.summary.run_dir.split('runs')[1] || d.summary.run_dir;
+      setStatus('生成完成','done');
+      log(`完成：${d.summary.n_frames} 帧 → ${d.summary.run_dir}`, true);
+      $('go').disabled=false; es.close(); es=null;
+    }
+    else if (d.stage==='error'){
+      setStatus('错误','err'); log('错误：'+d.msg); $('go').disabled=false; es.close(); es=null;
+    }
+  };
+  es.onerror = ()=>{ setStatus('连接中断','err'); $('go').disabled=false; };
+};
+
+$('unload').onclick = async () => {
+  await fetch(baseOf(curW) + '/unload'); setStatus('显存已卸载',''); log('已卸载全部模型，释放显存', true);
+};
+
+boot();
+</script>
+</body>
+</html>

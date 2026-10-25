@@ -1,0 +1,200 @@
+[
+ {
+  "idx": 1,
+  "file": "01_8ball.gif",
+  "note": "原有 · 8号球图标",
+  "frames": 26,
+  "sat": 5.81,
+  "preview": "01_8ball_preview.png",
+  "src": "data\\gif_raw\\noto\\8-ball_1f3b1.gif"
+ },
+ {
+  "idx": 2,
+  "file": "02_senpai.gif",
+  "note": "原有 · 前辈前辈表情包",
+  "frames": 35,
+  "sat": 10.22,
+  "preview": "02_senpai_preview.png",
+  "src": "data\\gif_raw\\noto\\3D87B14FBB731ED3A948AC6DD9EA6EBC.gif"
+ },
+ {
+  "idx": 3,
+  "file": "03_10278_Idolmaster_0006.gif",
+  "note": "新选 · 10278_Idolmaster",
+  "frames": 37,
+  "sat": 127.26,
+  "preview": "03_10278_Idolmaster_0006_preview.png",
+  "src": "data\\gif_raw\\anime\\10278_Idolmaster\\0006.gif"
+ },
+ {
+  "idx": 4,
+  "file": "04_20709_Sabage-bu_0004.gif",
+  "note": "新选 · 20709_Sabage-bu",
+  "frames": 31,
+  "sat": 90.96,
+  "preview": "04_20709_Sabage-bu_0004_preview.png",
+  "src": "data\\gif_raw\\anime\\20709_Sabage-bu\\0004.gif"
+ },
+ {
+  "idx": 5,
+  "file": "05_477_Aria-the-Animation_0005.gif",
+  "note": "新选 · 477_Aria-the-Animation",
+  "frames": 57,
+  "sat": 102.43,
+  "preview": "05_477_Aria-the-Animation_0005_preview.png",
+  "src": "data\\gif_raw\\anime\\477_Aria-the-Animation\\0005.gif"
+ },
+ {
+  "idx": 6,
+  "file": "06_41169_Love-Live-Superstar_0010.gif",
+  "note": "新选 · 41169_Love-Live-Superstar",
+  "frames": 72,
+  "sat": 73.43,
+  "preview": "06_41169_Love-Live-Superstar_0010_preview.png",
+  "src": "data\\gif_raw\\anime\\41169_Love-Live-Superstar\\0010.gif"
+ },
+ {
+  "idx": 7,
+  "file": "07_2890_Ponyo_0001.gif",
+  "note": "新选 · 2890_Ponyo",
+  "frames": 88,
+  "sat": 93.79,
+  "preview": "07_2890_Ponyo_0001_preview.png",
+  "src": "data\\gif_raw\\anime\\2890_Ponyo\\0001.gif"
+ },
+ {
+  "idx": 8,
+  "file": "08_39071_Machikado-Mazoku_0004.gif",
+  "note": "新选 · 39071_Machikado-Mazoku",
+  "frames": 87,
+  "sat": 88.16,
+  "preview": "08_39071_Machikado-Mazoku_0004_preview.png",
+  "src": "data\\gif_raw\\anime\\39071_Machikado-Mazoku\\0004.gif"
+ },
+ {
+  "idx": 9,
+  "file": "09_8557_Shinryaku-Ika-Musume_0006.gif",
+  "note": "新选 · 8557_Shinryaku-Ika-Musume",
+  "frames": 115,
+  "sat": 84.43,
+  "preview": "09_8557_Shinryaku-Ika-Musume_0006_preview.png",
+  "src": "data\\gif_raw\\anime\\8557_Shinryaku-Ika-Musume\\0006.gif"
+ },
+ {
+  "idx": 10,
+  "file": "10_199_Spirited-Away_0001.gif",
+  "note": "新选 · 199_Spirited-Away",
+  "frames": 41,
+  "sat": 72.47,
+  "preview": "10_199_Spirited-Away_0001_preview.png",
+  "src": "data\\gif_raw\\anime\\199_Spirited-Away\\0001.gif"
+ },
+ {
+  "idx": 11,
+  "file": "11_47917_Bocchi-the-Rock_0003.gif",
+  "note": "新选 · 47917_Bocchi-the-Rock",
+  "frames": 62,
+  "sat": 84.05,
+  "preview": "11_47917_Bocchi-the-Rock_0003_preview.png",
+  "src": "data\\gif_raw\\anime\\47917_Bocchi-the-Rock\\0003.gif"
+ },
+ {
+  "idx": 12,
+  "file": "12_21273_GochiUsa_0006.gif",
+  "note": "新选 · 21273_GochiUsa",
+  "frames": 46,
+  "sat": 90.97,
+  "preview": "12_21273_GochiUsa_0006_preview.png",
+  "src": "data\\gif_raw\\anime\\21273_GochiUsa\\0006.gif"
+ },
+ {
+  "idx": 13,
+  "file": "13_12815_Shirokuma-Cafe_0004.gif",
+  "note": "新选 · 12815_Shirokuma-Cafe",
+  "frames": 35,
+  "sat": 78.12,
+  "preview": "13_12815_Shirokuma-Cafe_0004_preview.png",
+  "src": "data\\gif_raw\\anime\\12815_Shirokuma-Cafe\\0004.gif"
+ },
+ {
+  "idx": 14,
+  "file": "14_33731_Gabriel-Dropout_0002.gif",
+  "note": "新选 · 33731_Gabriel-Dropout",
+  "frames": 28,
+  "sat": 59.94,
+  "preview": "14_33731_Gabriel-Dropout_0002_preview.png",
+  "src": "data\\gif_raw\\anime\\33731_Gabriel-Dropout\\0002.gif"
+ },
+ {
+  "idx": 15,
+  "file": "15_30276_One-Punch-Man_0002.gif",
+  "note": "新选 · 30276_One-Punch-Man",
+  "frames": 21,
+  "sat": 49.3,
+  "preview": "15_30276_One-Punch-Man_0002_preview.png",
+  "src": "data\\gif_raw\\anime\\30276_One-Punch-Man\\0002.gif"
+ },
+ {
+  "idx": 16,
+  "file": "16_1887_Lucky-Star_0007.gif",
+  "note": "新选 · 1887_Lucky-Star",
+  "frames": 11,
+  "sat": 84.02,
+  "preview": "16_1887_Lucky-Star_0007_preview.png",
+  "src": "data\\gif_raw\\anime\\1887_Lucky-Star\\0007.gif"
+ },
+ {
+  "idx": 17,
+  "file": "17_17549_Non-Non-Biyori_0001.gif",
+  "note": "新选 · 17549_Non-Non-Biyori",
+  "frames": 22,
+  "sat": 83.57,
+  "preview": "17_17549_Non-Non-Biyori_0001_preview.png",
+  "src": "data\\gif_raw\\anime\\17549_Non-Non-Biyori\\0001.gif"
+ },
+ {
+  "idx": 18,
+  "file": "18_11843_Danshi-Koukousei-no-Nichijou_0004.gif",
+  "note": "新选 · 11843_Danshi-Koukousei-no-Nichijou",
+  "frames": 29,
+  "sat": 80.88,
+  "preview": "18_11843_Danshi-Koukousei-no-Nichijou_0004_preview.png",
+  "src": "data\\gif_raw\\anime\\11843_Danshi-Koukousei-no-Nichijou\\0004.gif"
+ },
+ {
+  "idx": 19,
+  "file": "19_5680_K-On_0006.gif",
+  "note": "新选 · 5680_K-On",
+  "frames": 103,
+  "sat": 43.58,
+  "preview": "19_5680_K-On_0006_preview.png",
+  "src": "data\\gif_raw\\anime\\5680_K-On\\0006.gif"
+ },
+ {
+  "idx": 20,
+  "file": "20_38619_Joshikousei-no-Mudazukai_0002.gif",
+  "note": "新选 · 38619_Joshikousei-no-Mudazukai",
+  "frames": 49,
+  "sat": 61.44,
+  "preview": "20_38619_Joshikousei-no-Mudazukai_0002_preview.png",
+  "src": "data\\gif_raw\\anime\\38619_Joshikousei-no-Mudazukai\\0002.gif"
+ },
+ {
+  "idx": 21,
+  "file": "21_37993_Wataten_0004.gif",
+  "note": "新选 · 37993_Wataten",
+  "frames": 35,
+  "sat": 80.11,
+  "preview": "21_37993_Wataten_0004_preview.png",
+  "src": "data\\gif_raw\\anime\\37993_Wataten\\0004.gif"
+ },
+ {
+  "idx": 22,
+  "file": "22_2167_Clannad_0001.gif",
+  "note": "新选 · 2167_Clannad",
+  "frames": 12,
+  "sat": 75.41,
+  "preview": "22_2167_Clannad_0001_preview.png",
+  "src": "data\\gif_raw\\anime\\2167_Clannad\\0001.gif"
+ }
+]

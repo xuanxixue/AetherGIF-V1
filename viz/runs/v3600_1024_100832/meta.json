@@ -1,0 +1,17 @@
+{
+ "weight": "v3600",
+ "cond": {
+  "mode": "结构模型 · 给定目标场的物理重建",
+  "dim": 0,
+  "item": "02_senpai.gif",
+  "detail": {
+   "说明": "target_field 经 fft_bypass 注入"
+  }
+ },
+ "summary": {
+  "run_dir": "D:\\AetherGIF-V1\\viz\\runs\\v3600_1024_100832",
+  "n_frames": 30,
+  "a_mean": 0.4277,
+  "sync": 0.0744
+ }
+}

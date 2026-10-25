@@ -1,0 +1,18 @@
+{
+ "weight": "v4200_s1800",
+ "cond": {
+  "mode": "文生（文本→GIF）",
+  "dim": 6147,
+  "item": "前辈前辈表情包",
+  "detail": {
+   "text_norm": 0.9985,
+   "norm": 1.4132
+  }
+ },
+ "summary": {
+  "run_dir": "D:\\AetherGIF-V1\\viz\\runs\\v4200_s1800_1024_101011",
+  "n_frames": 30,
+  "a_mean": 0.389,
+  "sync": 0.2324
+ }
+}

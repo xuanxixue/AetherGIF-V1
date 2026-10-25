@@ -1,0 +1,16 @@
+@echo off
+echo [修复] 检查 transformers 版本...
+C:\Python312\python.exe -m pip show transformers | findstr "Version"
+echo [修复] 暂停 3 秒等待条件...
+timeout /t 3 /nobreak >nul
+
+echo [修复] 卸载现有 transformers...
+C:\Python312\python.exe -m pip uninstall -y transformers
+echo [修复] 安装兼容版本...
+C:\Python312\python.exe -m pip install transformers==4.44.2
+
+echo [修复] 检查安装结果...
+C:\Python312\python.exe -c "import transformers; print('transformers version:', transformers.__version__)"
+
+echo [完成] 请重新运行训练脚本：
+echo   C:\Python312\python.exe -u "scripts\test_cond_gen_v4.py" 250 "8-ball_1f3b1.gif" 0.0003

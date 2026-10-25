@@ -1,0 +1,18 @@
+{
+ "weight": "v4200_s1800",
+ "cond": {
+  "mode": "图生（图片→GIF）",
+  "dim": 6147,
+  "item": "10_199_Spirited-Away_0001.gif",
+  "detail": {
+   "img_norm": 0.9999,
+   "norm": 1.4142
+  }
+ },
+ "summary": {
+  "run_dir": "D:\\AetherGIF-V1\\viz\\runs\\v4200_s1800_1024_100453",
+  "n_frames": 30,
+  "a_mean": 0.312,
+  "sync": 0.1408
+ }
+}

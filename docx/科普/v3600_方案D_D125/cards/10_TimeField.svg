@@ -1,0 +1,227 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" role="img">
+
+<defs>
+  <linearGradient id="c10_bg" x1="0" y1="0" x2="0.75" y2="1">
+    <stop offset="0%" stop-color="#04060D"/>
+    <stop offset="52%" stop-color="#0A0F1E"/>
+    <stop offset="100%" stop-color="#070B16"/>
+  </linearGradient>
+  <radialGradient id="c10_a1" cx="0.5" cy="0.5" r="0.5">
+    <stop offset="0%" stop-color="#2DD4F0" stop-opacity="0.40"/>
+    <stop offset="100%" stop-color="#2DD4F0" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="c10_a2" cx="0.5" cy="0.5" r="0.5">
+    <stop offset="0%" stop-color="#C084FC" stop-opacity="0.24"/>
+    <stop offset="100%" stop-color="#C084FC" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="c10_a3" cx="0.5" cy="0.5" r="0.5">
+    <stop offset="0%" stop-color="#FBBF24" stop-opacity="0.16"/>
+    <stop offset="100%" stop-color="#FBBF24" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="c10_vig" cx="0.5" cy="0.48" r="0.74">
+    <stop offset="52%" stop-color="#000" stop-opacity="0"/>
+    <stop offset="100%" stop-color="#000" stop-opacity="0.82"/>
+  </radialGradient>
+  <linearGradient id="c10_sheen" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%" stop-color="#fff" stop-opacity="0"/>
+    <stop offset="48%" stop-color="#fff" stop-opacity="0.06"/>
+    <stop offset="100%" stop-color="#fff" stop-opacity="0"/>
+  </linearGradient>
+  <linearGradient id="c10_accent" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%" stop-color="#2DD4F0"/>
+    <stop offset="100%" stop-color="#C084FC"/>
+  </linearGradient>
+  <linearGradient id="c10_fade" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%" stop-color="#2DD4F0" stop-opacity="0"/>
+    <stop offset="50%" stop-color="#2DD4F0" stop-opacity="0.85"/>
+    <stop offset="100%" stop-color="#2DD4F0" stop-opacity="0"/>
+  </linearGradient>
+  <filter id="c10_soft" x="-60%" y="-60%" width="220%" height="220%">
+    <feGaussianBlur stdDeviation="92"/>
+  </filter>
+  <filter id="c10_soft2" x="-60%" y="-60%" width="220%" height="220%">
+    <feGaussianBlur stdDeviation="36"/>
+  </filter>
+  <filter id="c10_glow" x="-70%" y="-70%" width="240%" height="240%">
+    <feGaussianBlur stdDeviation="7" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="c10_glows" x="-70%" y="-70%" width="240%" height="240%">
+    <feGaussianBlur stdDeviation="2.8" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="c10_titleglow" x="-60%" y="-60%" width="220%" height="220%">
+    <feGaussianBlur stdDeviation="3.5" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="c10_grain" x="0" y="0" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" seed="7" result="n"/>
+    <feColorMatrix in="n" type="saturate" values="0"/>
+  </filter>
+  <pattern id="c10_dot" width="46" height="46" patternUnits="userSpaceOnUse">
+    <circle cx="2" cy="2" r="1.1" fill="#5B6884" opacity="0.30"/>
+  </pattern>
+  <pattern id="c10_fine" width="10" height="10" patternUnits="userSpaceOnUse">
+    <path d="M10 0H0V10" fill="none" stroke="#2DD4F0" stroke-width="0.5" opacity="0.11"/>
+  </pattern>
+  <marker id="c10_ar" viewBox="0 0 10 10" refX="8.4" refY="5" markerWidth="6.5"
+          markerHeight="6.5" orient="auto-start-reverse">
+    <path d="M0 0 L10 5 L0 10 z" fill="#2DD4F0"/>
+  </marker>
+</defs>
+
+<style>
+@keyframes drift1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(90px,60px) scale(1.14)}}
+@keyframes drift2{0%,100%{transform:translate(0,0) scale(1.1)}50%{transform:translate(-110px,40px) scale(0.94)}}
+@keyframes drift3{0%,100%{transform:translate(0,0)}50%{transform:translate(60px,-80px)}}
+@keyframes spinSlow{to{transform:rotate(360deg)}}
+@keyframes spinRev{to{transform:rotate(-360deg)}}
+@keyframes pulse{0%,100%{opacity:.35;transform:scale(1)}50%{opacity:.9;transform:scale(1.07)}}
+@keyframes pulseSoft{0%,100%{opacity:.18}50%{opacity:.62}}
+@keyframes scanline{0%{transform:translateY(-320px)}100%{transform:translateY(1300px)}}
+@keyframes dashflow{to{stroke-dashoffset:-440}}
+@keyframes floatUp{0%{transform:translate(0,0);opacity:0}
+ 14%{opacity:var(--op,.5)}82%{opacity:var(--op,.5)}100%{transform:translate(var(--dx,20px),-190px);opacity:0}}
+@keyframes twinkle{0%,100%{opacity:.12;transform:scale(.55)}50%{opacity:1;transform:scale(1.3)}}
+@keyframes gridScroll{to{transform:translateY(64px)}}
+@keyframes glowPulse{0%,100%{filter:drop-shadow(0 0 5px var(--gc,#2DD4F0))}
+ 50%{filter:drop-shadow(0 0 24px var(--gc,#2DD4F0))}}
+@keyframes sheenMove{0%{transform:translateX(-160%) skewX(-18deg)}100%{transform:translateX(360%) skewX(-18deg)}}
+@keyframes slideIn{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideL{from{opacity:0;transform:translateX(-34px)}to{opacity:1;transform:translateX(0)}}
+@keyframes growX{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes popIn{0%{opacity:0;transform:scale(.86)}68%{transform:scale(1.035)}100%{opacity:1;transform:scale(1)}}
+@keyframes ringSpin{0%{transform:rotate(0) scale(1)}50%{transform:rotate(180deg) scale(1.05)}100%{transform:rotate(360deg) scale(1)}}
+@keyframes dashdraw{from{stroke-dashoffset:var(--len,1000)}to{stroke-dashoffset:0}}
+@keyframes breathe{0%,100%{transform:scale(1);opacity:.85}50%{transform:scale(1.05);opacity:1}}
+@keyframes converge{0%{transform:translate(0,0) scale(1);opacity:.35}
+ 100%{transform:translate(var(--tx,0),var(--ty,0)) scale(.28);opacity:1}}
+@keyframes orbit{from{transform:rotate(0) translateX(var(--rad,180px)) rotate(0)}
+ to{transform:rotate(360deg) translateX(var(--rad,180px)) rotate(-360deg)}}
+@keyframes waveUp{0%,100%{transform:translateY(0)}50%{transform:translateY(-13px)}}
+@keyframes blink{0%,45%{opacity:1}50%,95%{opacity:.22}100%{opacity:1}}
+
+text{font-family:'Inter','HarmonyOS Sans SC','PingFang SC','Microsoft YaHei','Noto Sans SC',system-ui,sans-serif}
+.mono{font-family:'JetBrains Mono','Cascadia Mono','SF Mono',Consolas,ui-monospace,monospace}
+.anim-rise{animation:slideIn .95s cubic-bezier(.2,.8,.2,1) both}
+.anim-riseL{animation:slideL .95s cubic-bezier(.2,.8,.2,1) both}
+.anim-pop{animation:popIn .8s cubic-bezier(.2,.9,.25,1) both}
+.anim-breathe{animation:breathe 5.2s ease-in-out infinite}
+.anim-spin{animation:spinSlow 28s linear infinite;transform-box:fill-box;transform-origin:center}
+.anim-spinr{animation:spinRev 36s linear infinite;transform-box:fill-box;transform-origin:center}
+.anim-spin-c{animation:spinSlow 22s linear infinite;transform-origin:center}
+.anim-glow{animation:glowPulse 3.6s ease-in-out infinite}
+.anim-d1{animation:drift1 19s ease-in-out infinite}
+.anim-d2{animation:drift2 23s ease-in-out infinite}
+.anim-d3{animation:drift3 17s ease-in-out infinite}
+.anim-scan{animation:scanline 9.5s linear infinite}
+.anim-sheen{animation:sheenMove 12s ease-in-out infinite}
+.anim-float{animation:floatUp linear infinite}
+.anim-twinkle{animation:twinkle 3.8s ease-in-out infinite}
+.anim-growx{animation:growX 1.6s cubic-bezier(.2,.8,.2,1) both}
+.anim-draw{animation:dashdraw 2.3s ease-out both}
+.anim-converge{animation:converge 3.4s cubic-bezier(.2,.8,.2,1) both}
+.anim-orbit{animation:orbit var(--dur,14s) linear infinite;transform-box:fill-box;transform-origin:center}
+.anim-wave{animation:waveUp var(--dur,3.4s) ease-in-out infinite}
+.anim-blink{animation:blink 2.4s steps(1) infinite}
+.anim-dash{animation:dashflow 2.4s linear infinite}
+
+@keyframes playhead{0%{transform:translateX(0)}100%{transform:translateX(1080px)}}
+.ph{animation:playhead 7s linear infinite}
+@keyframes sigFill{0%{opacity:.25}50%{opacity:1}100%{opacity:.25}}
+.sg{animation:sigFill 7s ease-in-out infinite}
+</style>
+<rect width="1920" height="1080" fill="url(#c10_bg)"/>
+<g filter="url(#c10_soft)" style="mix-blend-mode:screen"><ellipse class="anim-d1" cx="300" cy="200" rx="560" ry="400" fill="url(#c10_a1)"/><ellipse class="anim-d2" cx="1720" cy="900" rx="430" ry="330" fill="url(#c10_a2)"/><ellipse class="anim-d3" cx="1120" cy="90" rx="360" ry="270" fill="url(#c10_a3)"/></g>
+<rect width="1920" height="1080" fill="url(#c10_dot)" opacity="0.5"/>
+<rect width="1920" height="1080" fill="url(#c10_fine)" opacity="0.5"/>
+<rect x="0" y="0" width="1920" height="2" fill="url(#c10_accent)" opacity="0.85"/>
+<text x="104" y="132" font-size="22" font-weight="700" letter-spacing="7" fill="#2DD4F0">PHYSICS 05 · TIME FIELD</text>
+<rect x="104" y="152" width="86" height="4" rx="2" fill="#2DD4F0"/>
+<text x="104" y="204" font-size="78" font-weight="800" letter-spacing="-1.5" fill="#EDF3FF">深度就是物理时间</text>
+<text x="104" y="254" font-size="27" fill="#9DABC8">12 层物理块不是「堆得更深」，而是一条从混乱到锁定的热力学时间线。</text>
+<text x="1816" y="128" text-anchor="end" font-size="19" font-weight="600" letter-spacing="3" fill="#5B6884">AETHERGIF v3600</text>
+<text x="1816" y="204" text-anchor="end" font-size="52" font-weight="800" fill="#5B6884">10<tspan fill="#22304E"> / 18</tspan></text>
+<text x="150" y="380" font-size="21" font-weight="800" fill="#EDF3FF">三条课程曲线，全部由 t = block/(R−1) ∈ [0,1] 驱动</text>
+<line x1="250" y1="420" x2="250" y2="650" stroke="#18223A" stroke-width="1"/>
+<line x1="358" y1="420" x2="358" y2="650" stroke="#18223A" stroke-width="1"/>
+<line x1="466" y1="420" x2="466" y2="650" stroke="#18223A" stroke-width="1"/>
+<line x1="574" y1="420" x2="574" y2="650" stroke="#18223A" stroke-width="1"/>
+<line x1="682" y1="420" x2="682" y2="650" stroke="#18223A" stroke-width="1"/>
+<line x1="790" y1="420" x2="790" y2="650" stroke="#18223A" stroke-width="1"/>
+<line x1="898" y1="420" x2="898" y2="650" stroke="#18223A" stroke-width="1"/>
+<line x1="1006" y1="420" x2="1006" y2="650" stroke="#18223A" stroke-width="1"/>
+<line x1="1114" y1="420" x2="1114" y2="650" stroke="#18223A" stroke-width="1"/>
+<line x1="1222" y1="420" x2="1222" y2="650" stroke="#18223A" stroke-width="1"/>
+<line x1="1330" y1="420" x2="1330" y2="650" stroke="#18223A" stroke-width="1"/>
+<line x1="250" y1="650" x2="1330" y2="650" stroke="#22304E" stroke-width="1.6"/>
+<line x1="250" y1="420" x2="250" y2="650" stroke="#22304E" stroke-width="1.6"/>
+<path d="M250.0 647.9 L260.8 647.7 L271.6 647.5 L282.4 647.2 L293.2 647.0 L304.0 646.7 L314.8 646.4 L325.6 646.1 L336.4 645.7 L347.2 645.3 L358.0 644.9 L368.8 644.4 L379.6 643.9 L390.4 643.3 L401.2 642.7 L412.0 642.1 L422.8 641.3 L433.6 640.5 L444.4 639.7 L455.2 638.8 L466.0 637.8 L476.8 636.7 L487.6 635.5 L498.4 634.2 L509.2 632.9 L520.0 631.4 L530.8 629.8 L541.6 628.1 L552.4 626.2 L563.2 624.2 L574.0 622.1 L584.8 619.8 L595.6 617.4 L606.4 614.8 L617.2 612.0 L628.0 609.1 L638.8 605.9 L649.6 602.6 L660.4 599.2 L671.2 595.5 L682.0 591.7 L692.8 587.7 L703.6 583.5 L714.4 579.2 L725.2 574.7 L736.0 570.1 L746.8 565.3 L757.6 560.4 L768.4 555.5 L779.2 550.4 L790.0 545.3 L800.8 540.2 L811.6 535.0 L822.4 529.8 L833.2 524.7 L844.0 519.6 L854.8 514.5 L865.6 509.6 L876.4 504.7 L887.2 499.9 L898.0 495.3 L908.8 490.8 L919.6 486.5 L930.4 482.3 L941.2 478.3 L952.0 474.5 L962.8 470.8 L973.6 467.4 L984.4 464.1 L995.2 460.9 L1006.0 458.0 L1016.8 455.2 L1027.6 452.6 L1038.4 450.2 L1049.2 447.9 L1060.0 445.8 L1070.8 443.8 L1081.6 441.9 L1092.4 440.2 L1103.2 438.6 L1114.0 437.1 L1124.8 435.8 L1135.6 434.5 L1146.4 433.3 L1157.2 432.2 L1168.0 431.2 L1178.8 430.3 L1189.6 429.5 L1200.4 428.7 L1211.2 427.9 L1222.0 427.3 L1232.8 426.7 L1243.6 426.1 L1254.4 425.6 L1265.2 425.1 L1276.0 424.7 L1286.8 424.3 L1297.6 423.9 L1308.4 423.6 L1319.2 423.3 L1330.0 423.0" fill="none" stroke="#FBBF24" stroke-width="3.4" stroke-linecap="round" filter="url(#c10_glows)"/>
+<path d="M250.0 426.9 L260.8 431.0 L271.6 435.0 L282.4 439.0 L293.2 443.0 L304.0 446.9 L314.8 450.7 L325.6 454.5 L336.4 458.3 L347.2 462.0 L358.0 465.7 L368.8 469.3 L379.6 472.9 L390.4 476.5 L401.2 480.0 L412.0 483.4 L422.8 486.8 L433.6 490.2 L444.4 493.5 L455.2 496.8 L466.0 500.0 L476.8 503.2 L487.6 506.4 L498.4 509.5 L509.2 512.5 L520.0 515.5 L530.8 518.5 L541.6 521.4 L552.4 524.3 L563.2 527.2 L574.0 530.0 L584.8 532.7 L595.6 535.4 L606.4 538.1 L617.2 540.7 L628.0 543.3 L638.8 545.8 L649.6 548.3 L660.4 550.8 L671.2 553.2 L682.0 555.5 L692.8 557.8 L703.6 560.1 L714.4 562.4 L725.2 564.5 L736.0 566.7 L746.8 568.8 L757.6 570.9 L768.4 572.9 L779.2 574.9 L790.0 576.8 L800.8 578.7 L811.6 580.5 L822.4 582.4 L833.2 584.1 L844.0 585.8 L854.8 587.5 L865.6 589.2 L876.4 590.8 L887.2 592.3 L898.0 593.9 L908.8 595.3 L919.6 596.8 L930.4 598.2 L941.2 599.5 L952.0 600.8 L962.8 602.1 L973.6 603.3 L984.4 604.5 L995.2 605.7 L1006.0 606.8 L1016.8 607.9 L1027.6 608.9 L1038.4 609.9 L1049.2 610.8 L1060.0 611.8 L1070.8 612.6 L1081.6 613.5 L1092.4 614.3 L1103.2 615.0 L1114.0 615.7 L1124.8 616.4 L1135.6 617.1 L1146.4 617.7 L1157.2 618.2 L1168.0 618.8 L1178.8 619.3 L1189.6 619.7 L1200.4 620.1 L1211.2 620.5 L1222.0 620.8 L1232.8 621.2 L1243.6 621.4 L1254.4 621.7 L1265.2 621.9 L1276.0 622.0 L1286.8 622.2 L1297.6 622.3 L1308.4 622.3 L1319.2 622.4 L1330.0 622.4" fill="none" stroke="#FB7185" stroke-width="3.4" stroke-linecap="round"/>
+<path d="M250.0 615.5 L260.8 614.9 L271.6 614.1 L282.4 613.2 L293.2 612.2 L304.0 611.1 L314.8 610.0 L325.6 608.9 L336.4 607.7 L347.2 606.4 L358.0 605.2 L368.8 603.8 L379.6 602.5 L390.4 601.1 L401.2 599.7 L412.0 598.3 L422.8 596.9 L433.6 595.4 L444.4 593.9 L455.2 592.4 L466.0 590.9 L476.8 589.3 L487.6 587.8 L498.4 586.2 L509.2 584.6 L520.0 583.0 L530.8 581.3 L541.6 579.7 L552.4 578.0 L563.2 576.3 L574.0 574.6 L584.8 572.9 L595.6 571.2 L606.4 569.5 L617.2 567.7 L628.0 566.0 L638.8 564.2 L649.6 562.4 L660.4 560.6 L671.2 558.8 L682.0 557.0 L692.8 555.1 L703.6 553.3 L714.4 551.4 L725.2 549.6 L736.0 547.7 L746.8 545.8 L757.6 543.9 L768.4 542.0 L779.2 540.1 L790.0 538.1 L800.8 536.2 L811.6 534.3 L822.4 532.3 L833.2 530.3 L844.0 528.3 L854.8 526.4 L865.6 524.4 L876.4 522.4 L887.2 520.4 L898.0 518.3 L908.8 516.3 L919.6 514.3 L930.4 512.2 L941.2 510.2 L952.0 508.1 L962.8 506.0 L973.6 504.0 L984.4 501.9 L995.2 499.8 L1006.0 497.7 L1016.8 495.6 L1027.6 493.5 L1038.4 491.3 L1049.2 489.2 L1060.0 487.1 L1070.8 484.9 L1081.6 482.8 L1092.4 480.6 L1103.2 478.5 L1114.0 476.3 L1124.8 474.1 L1135.6 471.9 L1146.4 469.7 L1157.2 467.5 L1168.0 465.3 L1178.8 463.1 L1189.6 460.9 L1200.4 458.7 L1211.2 456.4 L1222.0 454.2 L1232.8 452.0 L1243.6 449.7 L1254.4 447.5 L1265.2 445.2 L1276.0 442.9 L1286.8 440.7 L1297.6 438.4 L1308.4 436.1 L1319.2 433.8 L1330.0 431.5" fill="none" stroke="#2DD4F0" stroke-width="3.4" stroke-linecap="round"/>
+<g class="ph"><line x1="250" y1="400" x2="250" y2="666" stroke="#C084FC" stroke-width="2.4" opacity="0.85" filter="url(#c10_glows)"/></g>
+<text x="258" y="394" font-size="17" font-weight="800" fill="#FBBF24">κ(t) 耦合强度课程</text>
+<text x="258" y="690" font-size="17" font-weight="800" fill="#FB7185">T(t) 温度退火（热探索 → 冷锁定）</text>
+<text x="1322" y="690" font-size="17" font-weight="800" fill="#2DD4F0" text-anchor="end">ω_d(t) 几何扫频（低 → 高）</text>
+<line x1="250" y1="650" x2="250" y2="659" stroke="#22304E" stroke-width="1.4"/>
+<text x="250.0" y="682" font-size="15" font-weight="600" fill="#5B6884" text-anchor="middle" class="mono">0</text>
+<line x1="340" y1="650" x2="340" y2="659" stroke="#22304E" stroke-width="1.4"/>
+<text x="340.0" y="682" font-size="15" font-weight="600" fill="#5B6884" text-anchor="middle" class="mono">1</text>
+<line x1="430" y1="650" x2="430" y2="659" stroke="#22304E" stroke-width="1.4"/>
+<text x="430.0" y="682" font-size="15" font-weight="600" fill="#5B6884" text-anchor="middle" class="mono">2</text>
+<line x1="520" y1="650" x2="520" y2="659" stroke="#22304E" stroke-width="1.4"/>
+<text x="520.0" y="682" font-size="15" font-weight="600" fill="#5B6884" text-anchor="middle" class="mono">3</text>
+<line x1="610" y1="650" x2="610" y2="659" stroke="#22304E" stroke-width="1.4"/>
+<text x="610.0" y="682" font-size="15" font-weight="600" fill="#5B6884" text-anchor="middle" class="mono">4</text>
+<line x1="700" y1="650" x2="700" y2="659" stroke="#22304E" stroke-width="1.4"/>
+<text x="700.0" y="682" font-size="15" font-weight="600" fill="#5B6884" text-anchor="middle" class="mono">5</text>
+<line x1="790" y1="650" x2="790" y2="659" stroke="#22304E" stroke-width="1.4"/>
+<text x="790.0" y="682" font-size="15" font-weight="600" fill="#5B6884" text-anchor="middle" class="mono">6</text>
+<line x1="880" y1="650" x2="880" y2="659" stroke="#22304E" stroke-width="1.4"/>
+<text x="880.0" y="682" font-size="15" font-weight="600" fill="#5B6884" text-anchor="middle" class="mono">7</text>
+<line x1="970" y1="650" x2="970" y2="659" stroke="#22304E" stroke-width="1.4"/>
+<text x="970.0" y="682" font-size="15" font-weight="600" fill="#5B6884" text-anchor="middle" class="mono">8</text>
+<line x1="1060" y1="650" x2="1060" y2="659" stroke="#22304E" stroke-width="1.4"/>
+<text x="1060.0" y="682" font-size="15" font-weight="600" fill="#5B6884" text-anchor="middle" class="mono">9</text>
+<line x1="1150" y1="650" x2="1150" y2="659" stroke="#22304E" stroke-width="1.4"/>
+<text x="1150.0" y="682" font-size="15" font-weight="600" fill="#5B6884" text-anchor="middle" class="mono">10</text>
+<line x1="1240" y1="650" x2="1240" y2="659" stroke="#22304E" stroke-width="1.4"/>
+<text x="1240.0" y="682" font-size="15" font-weight="600" fill="#5B6884" text-anchor="middle" class="mono">11</text>
+<line x1="1330" y1="650" x2="1330" y2="659" stroke="#22304E" stroke-width="1.4"/>
+<text x="1330.0" y="682" font-size="15" font-weight="600" fill="#5B6884" text-anchor="middle" class="mono">12</text>
+<text x="250" y="712" font-size="17" font-weight="600" fill="#5B6884">物理块序号 i  →  t = i/(R−1)  从 0 到 1  （R=12）</text>
+<g class="anim-rise" style="animation-delay:0.2s">
+<rect x="150" y="792" width="505" height="130" rx="16" fill="#0A0E1B" opacity="0.7" stroke="#22304E" stroke-width="1.2"/>
+<rect x="150" y="792" width="4" height="130" rx="2" fill="#FBBF24"/>
+<text x="176" y="832" font-size="19" font-weight="800" fill="#FBBF24">耦合强度课程</text>
+<text x="176" y="866" font-size="17" font-weight="600" fill="#EDF3FF" class="mono">κ(t) = κ_max·σ((t−t_c)/τ_c)</text>
+<text x="176" y="898" font-size="16" font-weight="500" fill="#5B6884">前期弱耦合让相位自由游走，后期强耦合拉进锁定。</text>
+</g>
+<g class="anim-rise" style="animation-delay:0.32s">
+<rect x="695" y="792" width="505" height="130" rx="16" fill="#0A0E1B" opacity="0.7" stroke="#22304E" stroke-width="1.2"/>
+<rect x="695" y="792" width="4" height="130" rx="2" fill="#FB7185"/>
+<text x="721" y="832" font-size="19" font-weight="800" fill="#FB7185">温度退火</text>
+<text x="721" y="866" font-size="17" font-weight="600" fill="#EDF3FF" class="mono">T(t) = T_max·(1−t)^p + T_min</text>
+<text x="721" y="898" font-size="16" font-weight="500" fill="#5B6884"> Langevin 噪声随温度衰减，涨落逐渐让位于秩序。</text>
+</g>
+<g class="anim-rise" style="animation-delay:0.44s">
+<rect x="1240" y="792" width="505" height="130" rx="16" fill="#0A0E1B" opacity="0.7" stroke="#22304E" stroke-width="1.2"/>
+<rect x="1240" y="792" width="4" height="130" rx="2" fill="#2DD4F0"/>
+<text x="1266" y="832" font-size="19" font-weight="800" fill="#2DD4F0">驱动频率扫掠</text>
+<text x="1266" y="866" font-size="17" font-weight="600" fill="#EDF3FF" class="mono">ω_d(t) = ω_lo·(ω_hi/ω_lo)^t</text>
+<text x="1266" y="898" font-size="16" font-weight="500" fill="#5B6884">端点由可学习的本征频率谱导出——课程本身可训练。</text>
+</g>
+<rect width="1920" height="1080" filter="url(#c10_grain)" opacity="0.055" style="mix-blend-mode:overlay"/>
+<rect width="1920" height="1080" fill="url(#c10_vig)"/>
+<g style="mix-blend-mode:screen;opacity:.85"><rect class="anim-sheen" x="0" y="0" width="430" height="1080" fill="url(#c10_sheen)"/></g>
+<g fill="none" stroke="#2DD4F0" stroke-width="2" opacity="0.28">
+<path d="M46 104 L46 46 L104 46"/>
+<path d="M1874 104 L1874 46 L1816 46"/>
+<path d="M46 976 L46 1034 L104 1034"/>
+<path d="M1874 976 L1874 1034 L1816 1034"/>
+</g>
+<rect x="104" y="984" width="1712" height="1" fill="#18223A"/>
+<rect x="104" y="984" width="951" height="2" fill="#2DD4F0" opacity="0.75"/>
+<text x="104" y="1022" font-size="18" fill="#5B6884">AetherGIF v3600 · 方案 D · D=125 全谱编解码</text>
+<text x="1816" y="1022" text-anchor="end" font-size="18" fill="#5B6884" class="mono">v3600_方案D_D125 / TECHNICAL_REPORT</text>
+</svg>

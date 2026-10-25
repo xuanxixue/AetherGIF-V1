@@ -1,0 +1,121 @@
+{
+ "n": 22,
+ "dim": 2048,
+ "max_frames": 8,
+ "items": [
+  {
+   "idx": "01",
+   "file": "01_8ball.gif",
+   "chars": 703
+  },
+  {
+   "idx": "02",
+   "file": "02_senpai.gif",
+   "chars": 672
+  },
+  {
+   "idx": "03",
+   "file": "03_10278_Idolmaster_0006.gif",
+   "chars": 649
+  },
+  {
+   "idx": "04",
+   "file": "04_20709_Sabage-bu_0004.gif",
+   "chars": 618
+  },
+  {
+   "idx": "05",
+   "file": "05_477_Aria-the-Animation_0005.gif",
+   "chars": 580
+  },
+  {
+   "idx": "06",
+   "file": "06_41169_Love-Live-Superstar_0010.gif",
+   "chars": 582
+  },
+  {
+   "idx": "07",
+   "file": "07_2890_Ponyo_0001.gif",
+   "chars": 531
+  },
+  {
+   "idx": "08",
+   "file": "08_39071_Machikado-Mazoku_0004.gif",
+   "chars": 586
+  },
+  {
+   "idx": "09",
+   "file": "09_8557_Shinryaku-Ika-Musume_0006.gif",
+   "chars": 590
+  },
+  {
+   "idx": "10",
+   "file": "10_199_Spirited-Away_0001.gif",
+   "chars": 613
+  },
+  {
+   "idx": "11",
+   "file": "11_47917_Bocchi-the-Rock_0003.gif",
+   "chars": 525
+  },
+  {
+   "idx": "12",
+   "file": "12_21273_GochiUsa_0006.gif",
+   "chars": 528
+  },
+  {
+   "idx": "13",
+   "file": "13_12815_Shirokuma-Cafe_0004.gif",
+   "chars": 552
+  },
+  {
+   "idx": "14",
+   "file": "14_33731_Gabriel-Dropout_0002.gif",
+   "chars": 558
+  },
+  {
+   "idx": "15",
+   "file": "15_30276_One-Punch-Man_0002.gif",
+   "chars": 526
+  },
+  {
+   "idx": "16",
+   "file": "16_1887_Lucky-Star_0007.gif",
+   "chars": 561
+  },
+  {
+   "idx": "17",
+   "file": "17_17549_Non-Non-Biyori_0001.gif",
+   "chars": 526
+  },
+  {
+   "idx": "18",
+   "file": "18_11843_Danshi-Koukousei-no-Nichijou_0004.gif",
+   "chars": 543
+  },
+  {
+   "idx": "19",
+   "file": "19_5680_K-On_0006.gif",
+   "chars": 528
+  },
+  {
+   "idx": "20",
+   "file": "20_38619_Joshikousei-no-Mudazukai_0002.gif",
+   "chars": 570
+  },
+  {
+   "idx": "21",
+   "file": "21_37993_Wataten_0004.gif",
+   "chars": 511
+  },
+  {
+   "idx": "22",
+   "file": "22_2167_Clannad_0001.gif",
+   "chars": 551
+  }
+ ],
+ "cos_text_max": 0.7749401330947876,
+ "cos_first_max": 0.7552728056907654,
+ "cos_video_max": 0.6804396510124207,
+ "cross_tv_mean": 0.7109326720237732
+}

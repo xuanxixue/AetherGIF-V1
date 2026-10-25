@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PMNN：物理矩阵神经网络通用底层架构设计 v0.1</title>
+<style>
+  :root { --accent:#2b6a8f; --text:#1A1B1C; --sec:#5c6470; --border:#E4E3DD; --bg:#FBFBF9; --card:#FFFFFF; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'Roboto','PingFang SC','Segoe UI',Arial,sans-serif; color:var(--text); background:var(--bg); line-height:1.7; padding:32px 20px; }
+  .wrap { max-width:960px; margin:0 auto; }
+  h1 { font-size:22px; font-weight:700; margin-bottom:4px; }
+  .meta { color:var(--sec); font-size:12.5px; margin-bottom:24px; }
+  h2 { font-size:17px; font-weight:700; margin:32px 0 10px; padding-left:10px; border-left:4px solid var(--accent); }
+  h3 { font-size:14.5px; font-weight:600; margin:20px 0 8px; }
+  p { margin:8px 0; font-size:13.5px; }
+  .eq { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:12px 16px; margin:10px 0; font-family:'Consolas','Menlo',monospace; font-size:13.5px; overflow-x:auto; white-space:nowrap; }
+  table { width:100%; border-collapse:collapse; margin:12px 0; font-size:12.5px; }
+  th, td { border:1px solid var(--border); padding:7px 9px; text-align:left; vertical-align:top; }
+  th { background:#f1f0ea; font-weight:600; }
+  .tag { display:inline-block; font-size:11px; padding:1px 8px; border-radius:20px; margin-right:6px; }
+  .ok { background:#e6f4ea; color:#1e7a3a; }
+  .fix { background:#fff4e0; color:#9a6b00; }
+  .risk { background:#fdecea; color:#b33a3a; }
+  ul, ol { margin:8px 0 8px 22px; font-size:13.5px; }
+  li { margin:4px 0; }
+  .note { background:#f4f6fa; border:1px solid #dbe3ee; border-radius:10px; padding:12px 16px; font-size:13px; margin:12px 0; }
+  .fig { margin:16px 0; }
+  .fig svg { width:100%; height:auto; }
+  .caption { color:var(--sec); font-size:11.5px; margin-top:4px; }
+  a { color:var(--accent); text-decoration:none; word-break:break-all; }
+  code { background:#f1f0ea; padding:1px 5px; border-radius:4px; font-size:12.5px; }
+  .kv { display:flex; flex-wrap:wrap; gap:10px; margin:10px 0; }
+  .kv > div { flex:1 1 200px; background:var(--card); border:1px solid var(--border); border-radius:10px; padding:10px 12px; }
+  .kv b { display:block; font-size:12px; color:var(--sec); margin-bottom:3px; }
+  .kv span { font-size:13px; font-weight:600; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>物理矩阵神经网络（PMNN）通用底层架构设计</h1>
+<div class="meta">版本 V0.1 · 2026-09-11 · 面向 V6 物理振子视频生成项目 · 六扩展（ELF / 漂移场 / UN-0 相位 / 热力学熵 / 共振驻波 / 时间物理）统一方案</div>
+
+<h2>0. 定位一句话</h2>
+<p>把 Transformer 的「token + 注意力（统计亲和）」换成「复值振子场 + 相位同步（物理耦合）」，深度方向改为物理时间 ODE，输出层改为 ELF 式连续去噪轨迹——得到一套模态无关、与 Transformer 同构地位的通用底层。任何模态先「振子化」进入连续嵌入场，经 R 轮物理块演化，最后一步离散化回符号。</p>
+
+<h2>1. 来源核验记录（先修正前提，再谈设计）</h2>
+<table>
+<tr><th>来源</th><th>状态</th><th>真实机制（已核验）</th><th>与你描述的差异（需修正）</th></tr>
+<tr><td>ELF: Embedded Language Flows<br><a href="https://arxiv.org/pdf/2605.10938">arXiv 2605.10938</a>（2026-05，何恺明团队）</td><td><span class="tag ok">真实</span></td><td>连续嵌入空间 + 连续时间流匹配；全程连续、末步离散化；线性插值 x<sub>t</sub>=t·x₁+(1−t)x₀；训练目标嵌入由冻结 T5 编码器生成、推理时丢弃编码器；512 维压至 128 维瓶颈</td><td>补充两个实现细节：①编码器只用于训练目标、推理时完全省略；②瓶颈投影 512→128。你的「物理核心输出连续轨迹 + 解码网络共享去噪/解码」与 ELF 结构对齐成立</td></tr>
+<tr><td>Generative Modeling via Drifting<br><a href="https://arxiv.org/pdf/2602.04770">arXiv 2602.04770</a>（2026-02，何恺明团队）</td><td><span class="tag ok">真实</span></td><td>漂移场 V<sub>p,q</sub>(x) 由吸引 V⁺（真实样本拉动生成样本）与排斥 V⁻（生成样本互相推开、防坍缩）构成；损失 L=MSE(φ(x), stopgrad(φ(x)+V))；训练期演化 pushforward 分布、推理一步前向</td><td><span class="tag fix">需修正</span> 漂移场<b>不是线性公式</b>：真实实现是成对 L2 距离 + 温度 softmax（行/列）+ 几何平均的交叉加权力，本质非线性。矩阵公式可组合，但须用「线性算子 + 非线性耦合」形式（见 §5）。另外你要的「推理时每轮重算漂移方向」是对原范式（训练期演化 + 一步推理）的有意偏离，可行但需验证稳定性</td></tr>
+<tr><td>Un-0（Kuramoto 图像生成）<br><a href="https://github.com/unconv-ai/un-0">github.com/unconv-ai/un-0</a>（2026-06）</td><td><span class="tag ok">真实</span></td><td>纯 Kuramoto 相位动力学积分生成图像；无扩散调度、无对抗、无迭代去噪；不同相位模式对应不同图像类别；ImageNet-64 FID 6.74；代码 MIT、权重 CC-BY-NC-4.0</td><td><span class="tag fix">归属</span> 属 Unconventional AI（Naveen Rao 创业公司），与何恺明团队无关。<span class="tag fix">许可</span> 权重<b>非商用</b>（CC-BY-NC-4.0），商用需自行实现 Kuramoto 层。其团队验证「稀疏耦合提升可训练性」，支持本设计的结构化耦合方案</td></tr>
+</table>
+<p class="note">另注：「何凯明」正确写法为「何恺明」；「正子」系你的内部命名（复值场元素），本设计沿用但不作字面物理声明。</p>
+
+<h2>2. 统一状态表示：正子因子 = 复值场元素</h2>
+<div class="eq">z_i = a_i ⊙ e^(iθ_i) ∈ ℂ^d &nbsp;&nbsp;|&nbsp;&nbsp; Z = (A, Θ) ∈ ℝ^(N×d) × ℝ^(N×d)</div>
+<ul>
+<li><b>a<sub>i</sub> ∈ ℝ<sup>d</sup><sub>+</sub></b>：振幅向量（能量/置信度，保留个体信息——防全同步坍缩的关键通道）；</li>
+<li><b>θ<sub>i</sub> ∈ ℝ<sup>d</sup></b>：相位向量（信息整合的载体，由耦合动力学演化）；</li>
+<li><b>N</b>：振子数 = 序列长度（token/patch/帧）；<b>d</b>：通道数（场深度）。</li>
+</ul>
+<p>复化（从任意模态嵌入 e<sub>i</sub> 进入）：a<sub>i</sub> = softplus(W<sub>a</sub>e<sub>i</sub>+b<sub>a</sub>)，θ<sub>i</sub> = W<sub>θ</sub>e<sub>i</sub> mod 2π。模态无关：文本 token、图像 patch、视频时空 patch、音频帧一律走同一入口。</p>
+
+<h2>3. 物理块（Physical Block）：与 Transformer Block 对位的通用层</h2>
+<p>R 轮物理块堆叠 = Transformer 的层堆叠。每块四层：</p>
+
+<h3>3.1 相位同步层（Kuramoto 耦合 · 替代注意力）· 对应扩展三</h3>
+<div class="eq">dθ_i^ν / dt = ω_i^ν + Σ_j W_ij · sin(θ_j^ν − θ_i^ν) + κ(t)·g_i^ν</div>
+<ul>
+<li><b>ω<sub>i</sub><sup>ν</sup></b>：固有频率（输入驱动，每振子每通道）；</li>
+<li><b>W ∈ ℝ<sup>N×N</sup></b>：耦合矩阵（可学习；低秩 W=UVᵀ、r=32，或 Toeplitz 距离结构——借鉴 UN-0 稀疏性结论）；</li>
+<li><b>κ(t)</b>：同步强度 = <b>K 值</b>（时间场 × 热力学），控制「混沌 ↔ 同步」相变；</li>
+<li><b>g<sub>i</sub></b>：漂移场引导项（外部力，见 3.3）；</li>
+<li>序参量 r(t) = |(1/N)Σ<sub>j</sub> e^(iθ_j)| ∈ [0,1]：r→1 全同步 = 信息整合完成；K 值通过 Kuramoto 临界耦合 κ<sub>c</sub> 控制每块工作在探索（r≈0）还是决策（r≈1）区间。</li>
+</ul>
+<p>计算量与注意力同阶：全耦合 O(N²·d)，结构化 W 降至 O(N·d·r)。</p>
+
+<h3>3.2 共振-驻波 FNN 层 · 对应扩展五</h3>
+<p>每轮 FNN 实现「频率选择性放大 + 位置调制」，细化漂移方向：</p>
+<div class="eq">h = σ( W₂·( W₁·z + b₁ ) ⊙ sw(z, ω_d) + b₂ )</div>
+<ul>
+<li><b>共振增益</b>（Lorentzian 频率选择性）：A(ω_d, ω_n) = 1 / √((ω_d² − ω_n²)² + (2γω_d)²)——驱动频率 ω_d（来自 K 值）接近某通道固有频率 ω_n 时该通道被放大；</li>
+<li><b>驻波调制</b>（位置感知，振子序号 = 空间坐标）：SW<sub>m</sub>(p) = cos(k<sub>m</sub>·p)，k<sub>m</sub>=2πm/N——前向波与后向波叠加成驻波，节点/腹点结构作为位置基（物理版 RoPE）；</li>
+<li>FNN 输出即「共振选择后的场」，逐轮细化 K 值给定的方向。</li>
+</ul>
+
+<h3>3.3 漂移场层 · 对应扩展二（按真实机制实现）</h3>
+<div class="eq">V(Z) = V⁺(Z) − λ·V⁻(Z)</div>
+<div class="eq">V⁺ = Σ_k softmax_τ(−‖z_i − z_k^tar‖²)·(z_k^tar − z_i) &nbsp;（真实样本吸引）<br>
+V⁻ = Σ_j softmax_τ(−‖z_i − z_j‖²)·(z_j − z_i) &nbsp;（生成样本互斥，防坍缩）</div>
+<ul>
+<li>多温度 τ 求和取多尺度（沿用原论文）；损失形态 L<sub>drift</sub> = MSE(φ(x), stopgrad(φ(x)+V))；</li>
+<li><b>架构偏离（你的设定）</b>：原论文漂移场只在训练期起作用、推理一步前向；本架构中每轮物理块重算漂移方向 v<sub>φ</sub>(Z,t)，把「训练期演化」变成「推理时实时演化」——保留该设定，并在 §11 标注其验证点。</li>
+</ul>
+
+<h3>3.4 热力学-熵层 · 对应扩展四</h3>
+<ul>
+<li><b>能量（XY 模型哈密顿量）</b>：U(Z) = −Σ<sub>i,j</sub> W<sub>ij</sub>·cos(θ<sub>j</sub>−θ<sub>i</sub>)。关键恒等式：∂U/∂θ<sub>i</sub> = Σ<sub>j</sub> W<sub>ij</sub>·sin(θ<sub>j</sub>−θ<sub>i</sub>)——<b>Kuramoto 的 sin 耦合正是 XY 能量的梯度</b>，相位同步层本质是能量下降动力学（锁相 = 能量最小化）；</li>
+<li><b>熵</b>：S(Z) = −Σ<sub>i</sub> p<sub>i</sub> log p<sub>i</sub>，p<sub>i</sub> = softmax(a<sub>i</sub>)（振幅分布熵）；漂移场排斥项 V⁻ 即熵压 −T·∇S（防坍缩的正则化解释）；</li>
+<li><b>自由能</b>：F = U − T·S；温度调度 T(t)（退火）：T(t) = T_max·(1−t)^p + T_min，t: 0→1 冷却；</li>
+<li><b>噪声注入</b>（涨落-耗散）：η ~ N(0, 2T/Δt) 朗之万项，训练期/采样期控制探索量。</li>
+</ul>
+
+<h3>3.5 时间物理层 · 对应扩展六</h3>
+<ul>
+<li><b>深度 = 物理时间</b>：整个堆叠是 ODE dZ/dt = f<sub>φ</sub>(Z, t, K(t))，t ∈ [0,1]，用 Heun/RK4 积分（可逆 → 显存与深度无关）；</li>
+<li><b>时间反演对称</b>：编码/理解 = 正向积分（t: 0→1，场同步）；生成 = 时间反演（高熵噪声态 → 低熵数据态，由 K 值驱动、系统开放导出熵）；</li>
+<li><b>时间场</b>：提供全局时间坐标与驱动协议曲线 κ(t)、T(t)、ω_d(t)（见 §7）。</li>
+</ul>
+
+<h2>4. 架构总览图</h2>
+<div class="fig">
+<svg viewBox="0 0 980 548" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="PMNN架构总览">
+  <defs>
+    <marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="#5c6470"/></marker>
+  </defs>
+  <text x="16" y="24" font-size="16" font-weight="700" fill="#1A1B1C">PMNN 通用底层：连续嵌入场 + 物理耦合动力学</text>
+  <text x="16" y="42" font-size="11.5" fill="#5c6470">数据流（横轴 = 物理时间 t: 0→1）· 六扩展落点 · 与 Transformer 组件对位</text>
+
+  <!-- pipeline boxes -->
+  <rect x="16" y="90" width="150" height="104" rx="10" fill="#FFFFFF" stroke="#E4E3DD"/>
+  <text x="30" y="112" font-size="13" font-weight="600" fill="#1A1B1C">输入模态</text>
+  <text x="30" y="132" font-size="11" fill="#5c6470">文本 · 图像</text>
+  <text x="30" y="148" font-size="11" fill="#5c6470">视频 · 音频</text>
+  <text x="30" y="172" font-size="10.5" fill="#5c6470">任意离散序列</text>
+
+  <rect x="186" y="90" width="150" height="104" rx="10" fill="#FFFFFF" stroke="#E4E3DD"/>
+  <text x="200" y="112" font-size="13" font-weight="600" fill="#1A1B1C">① 振子化编码</text>
+  <text x="200" y="134" font-size="11" fill="#5c6470">z_i = a_i ⊙ e^(iθ_i)</text>
+  <text x="200" y="152" font-size="11" fill="#5c6470">复值场 Z ∈ ℂ^(N×d)</text>
+  <text x="200" y="170" font-size="10.5" fill="#5c6470">N 振子 × d 通道</text>
+
+  <rect x="356" y="64" width="300" height="208" rx="12" fill="#F4F3EE" stroke="#E4E3DD"/>
+  <text x="370" y="86" font-size="12.5" font-weight="700" fill="#1A1B1C">② 物理核心 · R 轮物理块</text>
+  <text x="370" y="102" font-size="10.5" fill="#5c6470">对位：Transformer 层堆叠</text>
+  <rect x="368" y="110" width="276" height="34" rx="8" fill="#FFFFFF"/>
+  <text x="378" y="125" font-size="11" font-weight="600" fill="#1A1B1C">相位同步 · Kuramoto</text>
+  <text x="378" y="139" font-size="10" fill="#5c6470">θ̇ = ω + ΣW·sin(Δθ) + κ(t)·g　(对位：注意力)</text>
+  <rect x="368" y="150" width="276" height="34" rx="8" fill="#FFFFFF"/>
+  <text x="378" y="165" font-size="11" font-weight="600" fill="#1A1B1C">共振-驻波 FNN</text>
+  <text x="378" y="179" font-size="10" fill="#5c6470">频率选择性放大 + 驻波位置调制 (对位：FFN)</text>
+  <rect x="368" y="190" width="276" height="34" rx="8" fill="#FFFFFF"/>
+  <text x="378" y="205" font-size="11" font-weight="600" fill="#1A1B1C">漂移场 · Drifting</text>
+  <text x="378" y="219" font-size="10" fill="#5c6470">吸引 − 排斥，推理时逐轮活跃 (对位：分布演化)</text>
+  <rect x="368" y="230" width="276" height="34" rx="8" fill="#FFFFFF"/>
+  <text x="378" y="245" font-size="11" font-weight="600" fill="#1A1B1C">热力学-熵</text>
+  <text x="378" y="259" font-size="10" fill="#5c6470">自由能下降 + 熵压防坍缩 (对位：能量/温度)</text>
+
+  <rect x="676" y="90" width="140" height="104" rx="10" fill="#FFFFFF" stroke="#E4E3DD"/>
+  <text x="690" y="112" font-size="13" font-weight="600" fill="#1A1B1C">③ 连续轨迹</text>
+  <text x="690" y="134" font-size="11" fill="#5c6470">ELF 流匹配</text>
+  <text x="690" y="152" font-size="11" fill="#5c6470">x_t = t·x₁+(1−t)x₀</text>
+  <text x="690" y="170" font-size="10.5" fill="#5c6470">t∈[0,1] 全程连续</text>
+
+  <rect x="836" y="90" width="128" height="104" rx="10" fill="#FFFFFF" stroke="#E4E3DD"/>
+  <text x="850" y="112" font-size="13" font-weight="600" fill="#1A1B1C">④ 末步解码</text>
+  <text x="850" y="134" font-size="11" fill="#5c6470">反嵌入矩阵</text>
+  <text x="850" y="152" font-size="11" fill="#5c6470">去噪/解码双分支</text>
+  <text x="850" y="170" font-size="10.5" fill="#5c6470">mode 门控</text>
+
+  <!-- flow arrows -->
+  <line x1="166" y1="142" x2="184" y2="142" stroke="#5c6470" stroke-width="1.6" marker-end="url(#a1)"/>
+  <line x1="336" y1="142" x2="354" y2="142" stroke="#5c6470" stroke-width="1.6" marker-end="url(#a1)"/>
+  <line x1="656" y1="142" x2="674" y2="142" stroke="#5c6470" stroke-width="1.6" marker-end="url(#a1)"/>
+  <line x1="816" y1="142" x2="834" y2="142" stroke="#5c6470" stroke-width="1.6" marker-end="url(#a1)"/>
+
+  <!-- K bus -->
+  <rect x="356" y="316" width="460" height="58" rx="10" fill="#FFFFFF" stroke="#A3D5E8"/>
+  <text x="370" y="336" font-size="12" font-weight="700" fill="#2b6a8f">导航总线：时间场 × 热力学 → K 值</text>
+  <text x="370" y="356" font-size="11" fill="#5c6470">κ(t) 耦合强度 · T(t) 温度退火 · ω_d 驱动频率 · 熵预算</text>
+  <line x1="480" y1="316" x2="480" y2="274" stroke="#2b6a8f" stroke-width="1.4" stroke-dasharray="5,4" marker-end="url(#a1)"/>
+  <line x1="760" y1="316" x2="740" y2="196" stroke="#2b6a8f" stroke-width="1.4" stroke-dasharray="5,4" marker-end="url(#a1)"/>
+
+  <!-- time axis -->
+  <line x1="16" y1="410" x2="960" y2="410" stroke="#5c6470" stroke-width="1.4" marker-end="url(#a1)"/>
+  <text x="16" y="428" font-size="11" fill="#5c6470">t = 0　噪声 / 混沌 / 高熵</text>
+  <text x="800" y="428" font-size="11" fill="#5c6470">t = 1　数据 / 同步 / 低熵</text>
+  <text x="430" y="430" font-size="10.5" fill="#5c6470">物理时间 = 扩散时间 = 深度方向（可逆积分）</text>
+
+  <!-- transformer mapping strip -->
+  <text x="16" y="452" font-size="12" font-weight="700" fill="#1A1B1C">Transformer ↔ PMNN 组件对位</text>
+  <g font-size="11">
+    <rect x="16" y="462" width="228" height="64" rx="8" fill="#FFFFFF" stroke="#E4E3DD"/>
+    <text x="26" y="482" font-weight="600" fill="#1A1B1C">注意力 → 相位同步</text>
+    <text x="26" y="500" fill="#5c6470">softmax(QKᵀ) 统计亲和</text>
+    <text x="26" y="516" fill="#5c6470">→ Kuramoto 锁相动力学</text>
+    <rect x="252" y="462" width="228" height="64" rx="8" fill="#FFFFFF" stroke="#E4E3DD"/>
+    <text x="262" y="482" font-weight="600" fill="#1A1B1C">FFN → 共振-驻波 FNN</text>
+    <text x="262" y="500" fill="#5c6470">统计激活函数</text>
+    <text x="262" y="516" fill="#5c6470">→ 频率选择放大 + 驻波调制</text>
+    <rect x="488" y="462" width="228" height="64" rx="8" fill="#FFFFFF" stroke="#E4E3DD"/>
+    <text x="498" y="482" font-weight="600" fill="#1A1B1C">层堆叠 → 物理时间 ODE</text>
+    <text x="498" y="500" fill="#5c6470">离散深度</text>
+    <text x="498" y="516" fill="#5c6470">→ 连续时间积分（可逆）</text>
+    <rect x="724" y="462" width="228" height="64" rx="8" fill="#FFFFFF" stroke="#E4E3DD"/>
+    <text x="734" y="482" font-weight="600" fill="#1A1B1C">token 交叉熵 → 流匹配+漂移</text>
+    <text x="734" y="500" fill="#5c6470">逐步离散监督</text>
+    <text x="734" y="516" fill="#5c6470">→ 连续轨迹 + 分布演化</text>
+  </g>
+</svg>
+<div class="caption">示意：PMNN 数据流与组件对位，非精确工程图。</div>
+</div>
+
+<h2>5. 统一状态方程（六扩展合流的核心矩阵公式）</h2>
+<div class="eq">dZ/dt = M_κ(t)·Z + ∇_Z[ −U(Z) + T(t)·S(Z) ] + v_φ(Z, t) + η(t)</div>
+<ul>
+<li><b>M<sub>κ</sub>(t)·Z</b>：K 值导航的线性矩阵算子（时间场 × 热力学 → κ(t)；内含耦合强度缩放、频率选择矩阵、漂移线性部分）——这是你要的「矩阵公式」的线性主轴；</li>
+<li><b>∇<sub>Z</sub>[−U + T·S]</b>：物理势能下降 + 熵压。由于 U = −ΣW<sub>ij</sub>cos(θ<sub>j</sub>−θ<sub>i</sub>)，该项自动展开出 Kuramoto sin 耦合（扩展三）、自由能动力学（扩展四）、漂移排斥项（扩展二）——三个扩展在同一个梯度项里合流；</li>
+<li><b>v<sub>φ</sub>(Z,t)</b>：漂移场学习残差（扩展二，推理时逐轮活跃）；</li>
+<li><b>η(t)</b>：朗之万噪声（温度注入，涨落-耗散，扩展四）。</li>
+</ul>
+<p class="note">诚实标注：整体是「线性算子 + 非线性梯度项 + 学习残差 + 噪声」的混合动力学，不是纯线性矩阵公式——按真实机制组合，不假装全线性。</p>
+
+<h2>6. ELF 输出融合（扩展一）</h2>
+<ul>
+<li><b>轨迹</b>：物理核心不直接输出最终正子因子，而是输出连续嵌入空间的去噪轨迹 {x<sub>t</sub>}；插值 x<sub>t</sub> = t·x₁ + (1−t)x₀，x₀ ~ N(0,I)（整流流，与 ELF 一致）；</li>
+<li><b>条件信号</b>：K 值方向（时间场 × 热力学给出的 κ(t)、ω_d(t)、T(t)）充当流匹配条件 c——比普通条件信号多了物理约束（同步度、温度、熵预算）的精确性；</li>
+<li><b>共享权重</b>：物理核心即速度场网络 v<sub>θ</sub>(x<sub>t</sub>, t, c)，去噪与后续解码共用权重（ELF 同款）；</li>
+<li><b>正子解码网络双分支</b>：
+  <ul>
+  <li>去噪分支（t &lt; t_dec）：继续轨迹细化/速度场预测；</li>
+  <li>解码分支（t ≥ t_dec）：反嵌入矩阵 E ∈ ℝ^(d×V) 将连续嵌入投影回离散 token；</li>
+  <li>mode 门控：g(t) = σ(W<sub>g</sub>·[t, r(t), κ(t)])，t_dec ≈ 0.98——你的「mode token 机制」落地为连续门控标量；</li>
+  </ul></li>
+<li><b>ELF 同款技巧</b>：训练目标嵌入由冻结 T5 编码器生成（推理时丢弃编码器），轨迹空间用 128 维瓶颈。</li>
+</ul>
+
+<h2>7. 训练协议</h2>
+<ol>
+<li><b>总损失</b>：L = L<sub>fm</sub> + λ₁L<sub>sync</sub> + λ₂L<sub>drift</sub> + λ₃L<sub>F</sub>
+  <ul>
+  <li>L<sub>fm</sub> = E‖v<sub>θ</sub>(x<sub>t</sub>,t,c) − (x₁−x₀)‖²（流匹配速度匹配，ELF 主损失）；</li>
+  <li>L<sub>sync</sub> = ‖r(t) − r<sub>target</sub>(t)‖²（序参量跟踪 K 课程）；</li>
+  <li>L<sub>drift</sub> = MSE(φ(x), stopgrad(φ(x)+V))（漂移场一致性，原论文损失）；</li>
+  <li>L<sub>F</sub> = U(Z) − T·S(Z)（自由能正则，热力学层）。</li>
+  </ul></li>
+<li><b>K 课程</b>：κ(t) 从弱到强（先混沌探索、后同步整合）——对应扩散噪声调度；κ(t) = κ_max·σ((t−t_c)/τ)（在 t_c 处发生同步相变）；</li>
+<li><b>两阶段</b>：阶段 A 在冻结编码器目标上预训练物理核心（同步 + 共振基 + 漂移场）；阶段 B 端到端流匹配微调（T 退火 + 噪声注入）；</li>
+<li><b>数值</b>：Heun/RK4 积分，可逆层 → 训练显存与深度无关。</li>
+</ol>
+
+<h2>8. 推理协议</h2>
+<ul>
+<li><b>生成</b>：x₀ ~ N(0,I) → ODE 正向积分 t: 0→1，每步物理块计算（同步 + 驻波 + <b>漂移场逐轮活跃</b>）→ x₁ 干净嵌入 → t=1 解码分支反嵌入 → token；</li>
+<li><b>编码/理解</b>：正向时间积分，场同步至 r→1 提取全局状态（表示 = 同步后的场）；</li>
+<li><b>模态扩展</b>：视频 = 帧序列时空 patch → 时空振子场；时间物理层天然承载时间维度；轨迹作用于潜在嵌入（衔接 V6 的 480p/21:9 管线）。</li>
+</ul>
+
+<h2>9. 规模参数建议（示意配置，非实测）</h2>
+<table>
+<tr><th>项</th><th>建议值</th><th>依据</th></tr>
+<tr><td>轨迹瓶颈 d</td><td>128</td><td>ELF 同款（512 维 T5 嵌入 → 128 维瓶颈）</td></tr>
+<tr><td>内部隐藏维</td><td>768</td><td>与同规模 Transformer 可比</td></tr>
+<tr><td>振子数 N</td><td>512 – 4096</td><td>序列/token/patch 数</td></tr>
+<tr><td>物理轮次 R</td><td>12 – 24</td><td>与层数同量级；可逆积分省显存</td></tr>
+<tr><td>耦合矩阵 W</td><td>低秩 r=32 或 Toeplitz 距离结构</td><td>UN-0 稀疏性结论：稀疏耦合提升可训练性</td></tr>
+<tr><td>计算量</td><td>全耦合 O(N²·d)；结构化 O(N·d·r)</td><td>与注意力同阶</td></tr>
+<tr><td>训练显存</td><td>与深度近似无关（可逆 ODE）</td><td>Neural ODE 同款技术</td></tr>
+</table>
+
+<h2>10. Transformer ↔ PMNN 对位总表</h2>
+<table>
+<tr><th>维度</th><th>Transformer</th><th>PMNN</th></tr>
+<tr><td>基本单元</td><td>token / 嵌入向量</td><td>复值振子（振幅 + 相位）</td></tr>
+<tr><td>交互机制</td><td>注意力（softmax QKᵀ，统计亲和）</td><td>相位同步（Kuramoto 耦合，动力学锁相）</td></tr>
+<tr><td>位置编码</td><td>RoPE / ALiBi（人为函数）</td><td>驻波模式（波动干涉，位置 = 空间坐标）</td></tr>
+<tr><td>前馈</td><td>FFN（ReLU/GELU）</td><td>共振-驻波 FNN（频率选择性放大）</td></tr>
+<tr><td>深度</td><td>层堆叠（离散）</td><td>物理时间 ODE 积分（连续、可逆）</td></tr>
+<tr><td>分布建模</td><td>自回归 / softmax 交叉熵</td><td>流匹配 + 漂移场（连续轨迹 + 分布演化）</td></tr>
+<tr><td>输出</td><td>词表分布</td><td>连续去噪轨迹 → 末步反嵌入</td></tr>
+<tr><td>训练信号</td><td>token 级交叉熵</td><td>速度场匹配 + 同步/熵约束</td></tr>
+<tr><td>控制参数</td><td>采样温度 / 策略</td><td>K 值（时间场 × 热力学）× 熵预算</td></tr>
+<tr><td>通用性来源</td><td>任意模态 token 化</td><td>任意模态振子化（复值场）</td></tr>
+</table>
+
+<h2>11. 校准与风险（诚实标注）</h2>
+<ul>
+<li><b>「非统计」的准确边界</b>：去掉的是注意力机制与 token 级逐步交叉熵；流匹配与漂移场本质仍是分布建模（统计目标）。精确表述：<b>机制是物理的，分布目标是统计的</b>——两者不矛盾，也无需回避；</li>
+<li><b>「无人挑战」建议降级表述</b>：ELF、Drifting、UN-0、Kuramoto 同步网络在 ML 均有先例，真正没有先例的是「模态无关物理矩阵通用底层」这一组合 + K 值导航 + 推理时漂移场活跃——组合是新的，组件不是；</li>
+<li><b>全同步坍缩</b>（r→1 时个体信息同质化）：缓解 = 异质固有频率 ω<sub>i</sub> + 振幅通道保留个体信息 + 稀疏/局部耦合；</li>
+<li><b>连续空间训练不稳</b>（ELF 已知痛点：嵌入分布与高斯噪声差异大）：缓解 = 128 维瓶颈 + 归一化 + K 课程；</li>
+<li><b>ODE 数值误差累积</b>：Heun/RK4 + 残差连接；</li>
+<li><b>漂移场推理时活跃</b> = 对原论文的有意偏离：需验证每轮一步「分布对齐」的稳定性与额外成本（×R）；</li>
+<li><b>许可</b>：UN-0 权重 CC-BY-NC-4.0 非商用，商用需自实现 Kuramoto 层（本设计数学均为公开公式，无实现障碍）；</li>
+<li><b>「物理」的边界</b>：热力学/共振/时间物理以可计算、可微、可测的数学算子进入（XY 能量、Lorentzian 共振、ODE 时间反演），是类比算子而非字面物理声明。</li>
+</ul>
+
+<h2>12. 与 V6 视频项目衔接</h2>
+<ul>
+<li>该架构的模态无关性使其可直接作为视频生成骨干：帧序列 → 时空振子场 → 物理块演化 → 潜在嵌入轨迹 → 末步解码；</li>
+<li>时间物理层天然处理帧间时间维度，与你的物理振子视频生成路线同源；</li>
+<li>建议验证路径：先在文本/图像小规模验证（128 维瓶颈、CIFAR-10 级），重点测两项——① 同步层 R 轮内是否达到目标序参量 r(t)；② 漂移场推理时活跃是否优于训练期演化；通过后再上 480p/21:9 视频规格。</li>
+</ul>
+
+<h2>13. 参考文献（已核验）</h2>
+<ol>
+<li>He, K. ELF: Embedded Language Flows. arXiv:2605.10938, 2026. <a href="https://arxiv.org/pdf/2605.10938">https://arxiv.org/pdf/2605.10938</a></li>
+<li>He, K. et al. Generative Modeling via Drifting. arXiv:2602.04770, 2026. <a href="https://arxiv.org/pdf/2602.04770">https://arxiv.org/pdf/2602.04770</a></li>
+<li>Unconventional AI. Un-0: Image Generation via Kuramoto Dynamics. GitHub, 2026. <a href="https://github.com/unconv-ai/un-0">https://github.com/unconv-ai/un-0</a></li>
+</ol>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,34 @@
+==========================================================================
+[1] 加载 2 张素材 -> 频域场
+    8-ball_1f3b1.gif: N=250 a_mean=0.12408
+    3D87B14FBB731ED3A948AC6DD9EA6EBC.gif: N=250 a_mean=0.35459
+
+[2] 加载三路原始向量（data/clip_cache/，gif=真视频分支）
+    文本      : src0-vs-src1 cos=+0.3276
+    首帧      : src0-vs-src1 cos=+0.1891
+    GIF真视频  : src0-vs-src1 cos=+0.2723
+    cond_vec3 维度 = 6147
+
+[3] 训练 300 步（batch=1，随机素材 × 随机条件组合 × guidance dropout）
+    ★ GUID_P=0.5（每步以此概率丢掉 target_field，前向与推理一致）
+    ★ FORCE_INIT_P=0.0（每步以此概率强制初态=目标场=教师强制）
+    环境口径（对齐 run_sep_fix.cmd）：COND_GROUPS=5 COND_LOWRANK=16 PHASE_ACT=arctan IDEAL_CLAMP=3.1416 PH_ABS_W=1.0
+    init_mode=init, n_modules=8, mod_gamma=0.15
+    ffn_hidden=256（物理核容量）, guard_w=1.0（dtheta 守卫）
+    SPEC_W=0.0（B 分带能量形状）, HF_GUARD_W=1.0（A 高频单侧守卫, slack=1.5）
+    LO_FLOOR_W=0.5（低频占比下限守卫, floor=0.7）
+    ACC_K=2（梯度累积窗口，1=关闭）
+    WARM_BLOCKS=0（只训最后 K 个block；0=全训）
+    BAND_ABS_W=0.3（C 绝对幅度）, BAND_CAP_W=0.0（单侧上限×3.0）
+    PHASE_BAND_W=0.0（D 相位分组监督）, PHASE_FLOOR_W=0.0（相位下限守卫）
+    DISC_W=0.0, MARGIN_W=0.0, WCS_W=0.0, PH_ABS_W=1.0, FFT_W=1.0
+    条件组合（等概率）：['三路全给', '文生', '图生', 'GIF本身', '图文生', '文+GIF', '图+GIF']
+[INFO] 第4 路 FFT 场旁路已启用（逐位置，25× 频段瓶颈）
+[INFO] AetherGIFModel 初始化完成：d_model=125, n_blocks=12, 参数量 = 10,273,206
+[INFO] A/B 方案：init_mode=init, n_modules=8, mod_gamma=0.15
+[RESUME] 未指定，从随机初始化开始
+    参数量 = 10,273,206（10.27M，上限 500M）
+    优化器分组：其他=132 lr=0.0003，条件通路=28 lr=0.001
+  [   1] src=1 三路全给  DROP loss=16.9521 amp=0.0482 phase=2.9896 gen=5.3043 spec=2.764 hfg=3.0573 lo=0.4307 ba=0.1103 hs=1.507 pb=0.9507 disc=0.0000 mg=0.000(o+nan) wcs=0.000 pres=0.0000 color=0.000 wcos=+0.2345 wcos_c=+0.2745 |dθ|=1.569 dθcos=+0.001 hi/lo比=72.36 [11s/11s]
+          drop: n=  1 wcos=+0.234 wcos_c=+0.274 amp=0.0482 ph=2.990
+          keep: n=  0 wcos=+0.000 wcos_c=+0.000 amp=0.0000 ph=0.000

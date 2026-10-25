@@ -1,0 +1,198 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" role="img">
+
+<defs>
+  <linearGradient id="c18_bg" x1="0" y1="0" x2="0.75" y2="1">
+    <stop offset="0%" stop-color="#04060D"/>
+    <stop offset="52%" stop-color="#0A0F1E"/>
+    <stop offset="100%" stop-color="#070B16"/>
+  </linearGradient>
+  <radialGradient id="c18_a1" cx="0.5" cy="0.5" r="0.5">
+    <stop offset="0%" stop-color="#C084FC" stop-opacity="0.40"/>
+    <stop offset="100%" stop-color="#C084FC" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="c18_a2" cx="0.5" cy="0.5" r="0.5">
+    <stop offset="0%" stop-color="#C084FC" stop-opacity="0.24"/>
+    <stop offset="100%" stop-color="#C084FC" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="c18_a3" cx="0.5" cy="0.5" r="0.5">
+    <stop offset="0%" stop-color="#FBBF24" stop-opacity="0.16"/>
+    <stop offset="100%" stop-color="#FBBF24" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="c18_vig" cx="0.5" cy="0.48" r="0.74">
+    <stop offset="52%" stop-color="#000" stop-opacity="0"/>
+    <stop offset="100%" stop-color="#000" stop-opacity="0.82"/>
+  </radialGradient>
+  <linearGradient id="c18_sheen" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%" stop-color="#fff" stop-opacity="0"/>
+    <stop offset="48%" stop-color="#fff" stop-opacity="0.06"/>
+    <stop offset="100%" stop-color="#fff" stop-opacity="0"/>
+  </linearGradient>
+  <linearGradient id="c18_accent" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%" stop-color="#C084FC"/>
+    <stop offset="100%" stop-color="#C084FC"/>
+  </linearGradient>
+  <linearGradient id="c18_fade" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%" stop-color="#C084FC" stop-opacity="0"/>
+    <stop offset="50%" stop-color="#C084FC" stop-opacity="0.85"/>
+    <stop offset="100%" stop-color="#C084FC" stop-opacity="0"/>
+  </linearGradient>
+  <filter id="c18_soft" x="-60%" y="-60%" width="220%" height="220%">
+    <feGaussianBlur stdDeviation="92"/>
+  </filter>
+  <filter id="c18_soft2" x="-60%" y="-60%" width="220%" height="220%">
+    <feGaussianBlur stdDeviation="36"/>
+  </filter>
+  <filter id="c18_glow" x="-70%" y="-70%" width="240%" height="240%">
+    <feGaussianBlur stdDeviation="7" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="c18_glows" x="-70%" y="-70%" width="240%" height="240%">
+    <feGaussianBlur stdDeviation="2.8" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="c18_titleglow" x="-60%" y="-60%" width="220%" height="220%">
+    <feGaussianBlur stdDeviation="3.5" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="c18_grain" x="0" y="0" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" seed="7" result="n"/>
+    <feColorMatrix in="n" type="saturate" values="0"/>
+  </filter>
+  <pattern id="c18_dot" width="46" height="46" patternUnits="userSpaceOnUse">
+    <circle cx="2" cy="2" r="1.1" fill="#5B6884" opacity="0.30"/>
+  </pattern>
+  <pattern id="c18_fine" width="10" height="10" patternUnits="userSpaceOnUse">
+    <path d="M10 0H0V10" fill="none" stroke="#C084FC" stroke-width="0.5" opacity="0.11"/>
+  </pattern>
+  <marker id="c18_ar" viewBox="0 0 10 10" refX="8.4" refY="5" markerWidth="6.5"
+          markerHeight="6.5" orient="auto-start-reverse">
+    <path d="M0 0 L10 5 L0 10 z" fill="#C084FC"/>
+  </marker>
+</defs>
+
+<style>
+@keyframes drift1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(90px,60px) scale(1.14)}}
+@keyframes drift2{0%,100%{transform:translate(0,0) scale(1.1)}50%{transform:translate(-110px,40px) scale(0.94)}}
+@keyframes drift3{0%,100%{transform:translate(0,0)}50%{transform:translate(60px,-80px)}}
+@keyframes spinSlow{to{transform:rotate(360deg)}}
+@keyframes spinRev{to{transform:rotate(-360deg)}}
+@keyframes pulse{0%,100%{opacity:.35;transform:scale(1)}50%{opacity:.9;transform:scale(1.07)}}
+@keyframes pulseSoft{0%,100%{opacity:.18}50%{opacity:.62}}
+@keyframes scanline{0%{transform:translateY(-320px)}100%{transform:translateY(1300px)}}
+@keyframes dashflow{to{stroke-dashoffset:-440}}
+@keyframes floatUp{0%{transform:translate(0,0);opacity:0}
+ 14%{opacity:var(--op,.5)}82%{opacity:var(--op,.5)}100%{transform:translate(var(--dx,20px),-190px);opacity:0}}
+@keyframes twinkle{0%,100%{opacity:.12;transform:scale(.55)}50%{opacity:1;transform:scale(1.3)}}
+@keyframes gridScroll{to{transform:translateY(64px)}}
+@keyframes glowPulse{0%,100%{filter:drop-shadow(0 0 5px var(--gc,#2DD4F0))}
+ 50%{filter:drop-shadow(0 0 24px var(--gc,#2DD4F0))}}
+@keyframes sheenMove{0%{transform:translateX(-160%) skewX(-18deg)}100%{transform:translateX(360%) skewX(-18deg)}}
+@keyframes slideIn{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideL{from{opacity:0;transform:translateX(-34px)}to{opacity:1;transform:translateX(0)}}
+@keyframes growX{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes popIn{0%{opacity:0;transform:scale(.86)}68%{transform:scale(1.035)}100%{opacity:1;transform:scale(1)}}
+@keyframes ringSpin{0%{transform:rotate(0) scale(1)}50%{transform:rotate(180deg) scale(1.05)}100%{transform:rotate(360deg) scale(1)}}
+@keyframes dashdraw{from{stroke-dashoffset:var(--len,1000)}to{stroke-dashoffset:0}}
+@keyframes breathe{0%,100%{transform:scale(1);opacity:.85}50%{transform:scale(1.05);opacity:1}}
+@keyframes converge{0%{transform:translate(0,0) scale(1);opacity:.35}
+ 100%{transform:translate(var(--tx,0),var(--ty,0)) scale(.28);opacity:1}}
+@keyframes orbit{from{transform:rotate(0) translateX(var(--rad,180px)) rotate(0)}
+ to{transform:rotate(360deg) translateX(var(--rad,180px)) rotate(-360deg)}}
+@keyframes waveUp{0%,100%{transform:translateY(0)}50%{transform:translateY(-13px)}}
+@keyframes blink{0%,45%{opacity:1}50%,95%{opacity:.22}100%{opacity:1}}
+
+text{font-family:'Inter','HarmonyOS Sans SC','PingFang SC','Microsoft YaHei','Noto Sans SC',system-ui,sans-serif}
+.mono{font-family:'JetBrains Mono','Cascadia Mono','SF Mono',Consolas,ui-monospace,monospace}
+.anim-rise{animation:slideIn .95s cubic-bezier(.2,.8,.2,1) both}
+.anim-riseL{animation:slideL .95s cubic-bezier(.2,.8,.2,1) both}
+.anim-pop{animation:popIn .8s cubic-bezier(.2,.9,.25,1) both}
+.anim-breathe{animation:breathe 5.2s ease-in-out infinite}
+.anim-spin{animation:spinSlow 28s linear infinite;transform-box:fill-box;transform-origin:center}
+.anim-spinr{animation:spinRev 36s linear infinite;transform-box:fill-box;transform-origin:center}
+.anim-spin-c{animation:spinSlow 22s linear infinite;transform-origin:center}
+.anim-glow{animation:glowPulse 3.6s ease-in-out infinite}
+.anim-d1{animation:drift1 19s ease-in-out infinite}
+.anim-d2{animation:drift2 23s ease-in-out infinite}
+.anim-d3{animation:drift3 17s ease-in-out infinite}
+.anim-scan{animation:scanline 9.5s linear infinite}
+.anim-sheen{animation:sheenMove 12s ease-in-out infinite}
+.anim-float{animation:floatUp linear infinite}
+.anim-twinkle{animation:twinkle 3.8s ease-in-out infinite}
+.anim-growx{animation:growX 1.6s cubic-bezier(.2,.8,.2,1) both}
+.anim-draw{animation:dashdraw 2.3s ease-out both}
+.anim-converge{animation:converge 3.4s cubic-bezier(.2,.8,.2,1) both}
+.anim-orbit{animation:orbit var(--dur,14s) linear infinite;transform-box:fill-box;transform-origin:center}
+.anim-wave{animation:waveUp var(--dur,3.4s) ease-in-out infinite}
+.anim-blink{animation:blink 2.4s steps(1) infinite}
+.anim-dash{animation:dashflow 2.4s linear infinite}
+</style>
+<rect width="1920" height="1080" fill="url(#c18_bg)"/>
+<g filter="url(#c18_soft)" style="mix-blend-mode:screen"><ellipse class="anim-d1" cx="300" cy="200" rx="560" ry="400" fill="url(#c18_a1)"/><ellipse class="anim-d2" cx="1720" cy="900" rx="430" ry="330" fill="url(#c18_a2)"/><ellipse class="anim-d3" cx="1120" cy="90" rx="360" ry="270" fill="url(#c18_a3)"/></g>
+<rect width="1920" height="1080" fill="url(#c18_dot)" opacity="0.5"/>
+<rect width="1920" height="1080" fill="url(#c18_fine)" opacity="0.5"/>
+<rect x="0" y="0" width="1920" height="2" fill="url(#c18_accent)" opacity="0.85"/>
+<text x="104" y="132" font-size="22" font-weight="700" letter-spacing="7" fill="#C084FC">WHERE TO GO NEXT</text>
+<rect x="104" y="152" width="86" height="4" rx="2" fill="#C084FC"/>
+<text x="104" y="204" font-size="78" font-weight="800" letter-spacing="-1.5" fill="#EDF3FF">物理路线能走多远？</text>
+<text x="104" y="254" font-size="27" fill="#9DABC8">v3600 把「能不能用物理替代注意力」这个问题，从想象推进到了有数字支撑的实验事实。</text>
+<text x="1816" y="128" text-anchor="end" font-size="19" font-weight="600" letter-spacing="3" fill="#5B6884">AETHERGIF v3600</text>
+<text x="1816" y="204" text-anchor="end" font-size="52" font-weight="800" fill="#5B6884">18<tspan fill="#22304E"> / 18</tspan></text>
+<g class="anim-rise" style="animation-delay:0.15s">
+<rect x="150" y="356" width="505" height="180" rx="18" fill="#0A0E1B" opacity="0.78" stroke="#2DD4F0" stroke-width="1.2"/>
+<rect x="150" y="356" width="505" height="3" rx="1.5" fill="#2DD4F0" opacity="0.9"/>
+<circle cx="194" cy="408" r="20" fill="#2DD4F0" opacity="0.16" stroke="#2DD4F0" stroke-width="1.4"/><text x="194" y="414" text-anchor="middle" font-size="18" font-weight="800" fill="#2DD4F0">1</text>
+<text x="232" y="416" font-size="22" font-weight="800" fill="#EDF3FF">多片段泛化</text>
+<text x="178" y="462" font-size="16" font-weight="500" fill="#9DABC8">把单样本过拟合换成跨片段训练，才能谈「生成」两个字。</text>
+</g>
+<g class="anim-rise" style="animation-delay:0.28s">
+<rect x="695" y="356" width="505" height="180" rx="18" fill="#0A0E1B" opacity="0.78" stroke="#FBBF24" stroke-width="1.2"/>
+<rect x="695" y="356" width="505" height="3" rx="1.5" fill="#FBBF24" opacity="0.9"/>
+<circle cx="739" cy="408" r="20" fill="#FBBF24" opacity="0.16" stroke="#FBBF24" stroke-width="1.4"/><text x="739" y="414" text-anchor="middle" font-size="18" font-weight="800" fill="#FBBF24">2</text>
+<text x="777" y="416" font-size="22" font-weight="800" fill="#EDF3FF">γ 拆分 + 域统一</text>
+<text x="723" y="462" font-size="16" font-weight="500" fill="#9DABC8">γ_level / γ_shape 分家，log 与 log1p 统一到同一个域。</text>
+</g>
+<g class="anim-rise" style="animation-delay:0.41000000000000003s">
+<rect x="1240" y="356" width="505" height="180" rx="18" fill="#0A0E1B" opacity="0.78" stroke="#C084FC" stroke-width="1.2"/>
+<rect x="1240" y="356" width="505" height="3" rx="1.5" fill="#C084FC" opacity="0.9"/>
+<circle cx="1284" cy="408" r="20" fill="#C084FC" opacity="0.16" stroke="#C084FC" stroke-width="1.4"/><text x="1284" y="414" text-anchor="middle" font-size="18" font-weight="800" fill="#C084FC">3</text>
+<text x="1322" y="416" font-size="22" font-weight="800" fill="#EDF3FF">文本条件生成</text>
+<text x="1268" y="462" font-size="16" font-weight="500" fill="#9DABC8">Qwen2.5-0.5B 的四个条件头已经接好，只是还没被训练。</text>
+</g>
+<text x="150" y="604" font-size="22" font-weight="800" fill="#EDF3FF">复现路径</text>
+<rect x="150" y="628" width="1000" height="300" rx="18" fill="#070C17" opacity="0.85" stroke="#22304E" stroke-width="1.2"/>
+<rect x="150" y="628" width="4" height="300" rx="2" fill="#2DD4F0" opacity="0.9"/>
+<text x="176" y="664" font-size="17" font-weight="700" fill="#5B6884" letter-spacing="2.4">COMMANDS</text>
+<text x="176" y="706" font-size="17" class="mono" fill="#9DABC8">python scripts/diag_grid_source.py        # 1. D=125 往返无损</text>
+<text x="176" y="748" font-size="17" class="mono" fill="#9DABC8">python scripts/verify_dmodel_ceiling.py   # 2. 截断消融 D=64/100/125</text>
+<text x="176" y="790" font-size="17" class="mono" fill="#9DABC8">python scripts/overfit.py 150  3D87B14F...gif   # 3. 冒烟</text>
+<text x="176" y="832" font-size="17" class="mono" fill="#9DABC8">python scripts/overfit.py 2500 3D87B14F...gif   # 4. 完整训练</text>
+<text x="176" y="874" font-size="17" class="mono" fill="#9DABC8">python scripts/eval_generalize.py         # 5. 空间域评估</text>
+<rect x="1180" y="628" width="590" height="300" rx="18" fill="#0C1424" opacity="0.78" stroke="#FBBF24" stroke-width="1.2"/>
+<text x="1206" y="672" font-size="19" font-weight="800" fill="#FBBF24">身份指纹（回滚 / 复现锚点）</text>
+<rect x="1206" y="692" width="538" height="86" rx="10" fill="#060A14"/>
+<text x="1224" y="722" font-size="15" font-weight="500" fill="#9DABC8" class="mono">sd = torch.load(ckpt, map_location='cpu')</text>
+<text x="1224" y="748" font-size="15" font-weight="500" fill="#9DABC8" class="mono">print(sum(v.numel() for v in sd.values()))</text>
+<text x="1224" y="770" font-size="15" font-weight="700" fill="#FBBF24" class="mono"># 必须打印 2,022,232</text>
+<text x="1206" y="812" font-size="16" font-weight="500" fill="#9DABC8">训练日志、权重、输出 GIF 与本报告中的每一个数字都随快照一起发布，任</text>
+<text x="1206" y="836" font-size="16" font-weight="500" fill="#9DABC8">何人都能重新生成。</text>
+<text x="1206" y="892" font-size="16" font-weight="600" fill="#5B6884" class="mono">AetherGIF v3600 · 方案 D · D=125</text>
+<g class="anim-rise" style="animation-delay:.8s">
+<rect x="150" y="952" width="1620" height="1" rx="20" fill="none" opacity="0.55" stroke="none" stroke-width="1.2"/>
+<rect x="150" y="944" width="1620" height="1" fill="#18223A"/>
+<text x="150" y="992" font-size="30" font-weight="800" fill="#EDF3FF">把「注意」换成「共振」，把「层」换成「时间」——</text>
+<text x="1195" y="992" font-size="30" font-weight="800" fill="#C084FC" text-anchor="end">这条路已经走通了第一段。</text>
+</g>
+<rect width="1920" height="1080" filter="url(#c18_grain)" opacity="0.055" style="mix-blend-mode:overlay"/>
+<rect width="1920" height="1080" fill="url(#c18_vig)"/>
+<g style="mix-blend-mode:screen;opacity:.85"><rect class="anim-sheen" x="0" y="0" width="430" height="1080" fill="url(#c18_sheen)"/></g>
+<g fill="none" stroke="#C084FC" stroke-width="2" opacity="0.28">
+<path d="M46 104 L46 46 L104 46"/>
+<path d="M1874 104 L1874 46 L1816 46"/>
+<path d="M46 976 L46 1034 L104 1034"/>
+<path d="M1874 976 L1874 1034 L1816 1034"/>
+</g>
+<rect x="104" y="984" width="1712" height="1" fill="#18223A"/>
+<rect x="104" y="984" width="1712" height="2" fill="#C084FC" opacity="0.75"/>
+<text x="104" y="1022" font-size="18" fill="#5B6884">AetherGIF v3600 · 方案 D · D=125 全谱编解码</text>
+<text x="1816" y="1022" text-anchor="end" font-size="18" fill="#5B6884" class="mono">v3600_方案D_D125 / TECHNICAL_REPORT</text>
+</svg>

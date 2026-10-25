@@ -1,0 +1,41 @@
+[MEM:启动] RAM 可用 6.38GB (load 59%) | 提交剩余 14.13GB/36.9GB
+==============================================================================
+[CFG] v4200 多模态训练  预算上限=7.0天(604800s, 实际训 6天15:36:00)
+[CFG] mode=mix batch=1 acc=1 workers=4 compile=False
+[CFG] lr: 3e-05 →(warmup 300)→ 0.0003 →(cosine)→ 1e-05
+[CFG] 能力: 文生GIF / 图生GIF / 图文生GIF  (mode=mix)
+[CFG] 早停: 每 250 步检查 | patience=5 | min_steps=300 | val=8.0%
+[CFG] ★ 早停已禁用（--no-early-stop），会跑满预算
+==============================================================================
+[SPLIT] group 级隔离: 204 组 → 训练 400 条 / 验证 12 条
+[SPLIT] 验证集独占 16 个 group，与训练集 group 重叠 0 个 → ✓ 无泄漏
+[DATA] 14145 个 GIF | 204 group | 图像特征有效 14145 | mode=mix
+[DATA] 本实例实际使用 400 条（显式子集，require_image=False）
+[DATA] 14145 个 GIF | 204 group | 图像特征有效 14145 | mode=both
+[DATA] 本实例实际使用 12 条（显式子集，require_image=False）
+[INFO] AetherGIFModel 初始化完成：d_model=125, n_blocks=12, 参数量 = 3,860,826
+[PARAM] 3,860,826 参数  N=6144
+[BENCH] 实测 0.27 步/s
+[MEM:bench后] RAM 可用 3.60GB (load 77%) | 提交剩余 7.35GB/36.9GB
+[PLAN] 总步数 = 12  （0.27 步/s × 6天15:36:00）
+[WARN] 推算步数过少，检查 bench/rate
+[LR] warmup 300 步 → 峰值 0.0003，cosine 退火至 1e-05（终点 step 12）
+
+[RUN] 开始训练  按 Ctrl+C 可安全中断（断点已保存）
+
+
+[     1/12] loss=1.7984 (ema 1.7984) amp=0.0683 phase=0.2679 gain=2.9243 cos=+0.8573 wcos=+0.8932 a_out=0.1974 prof_cos=+0.3035 lr=3.09e-05
+          谱比(模型/target) 中位 5.43 | 本批模态 {'text': 0, 'image': 0, 'both': 1} | 已跑 00:03
+[██░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░]   8.3%  1/12 步  已用 00:03  剩余 ~00:40  0.27 步/s   [█████░░░░░░░░░░░░░░░░░░░░░░░░░░░]  16.7%  2/12 步  已用 00:07  剩余 ~00:36  0.27 步/s   
+[ERROR] 已保存断点 step=2（已跑 00:07）
+[MEM:崩溃时] RAM 可用 3.45GB (load 78%) | 提交剩余 7.22GB/36.9GB
+Traceback (most recent call last):
+  File "D:\AetherGIF-V1\docx\实验记录\versions\v4200_多模态CLIP产品版\scripts\train_multimodal.py", line 943, in main
+    stopper.update_baseline(step_time)
+  File "D:\AetherGIF-V1\docx\实验记录\versions\v4200_多模态CLIP产品版\scripts\train_multimodal.py", line 334, in update_baseline
+    elif step <= self.min_steps:
+         ^^^^
+NameError: name 'step' is not defined
+[ERROR] 续跑命令：--resume auto（默认就是 auto，直接重跑即可）
+
+EXIT=0

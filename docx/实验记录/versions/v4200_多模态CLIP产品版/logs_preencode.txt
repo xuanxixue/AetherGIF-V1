@@ -1,0 +1,93 @@
+[DEV] CUDA 可用，空闲 3.22 GB
+[DEV] 编码设备 cuda  fp16=True
+[INDEX] 复用已有索引：14145 条
+[TEXT] 204 个不同 group（去重后只需编码这么多）
+[transformers] You are using a model of type `jina_clip` to instantiate a model of type ``. This may be expected if you are loading a checkpoint that shares a subset of the architecture (e.g., loading a `sam2_video` checkpoint into `Sam2Model`), but is otherwise not supported and can yield errors. Please verify that the checkpoint is compatible with the model you are instantiating.
+[transformers] The tokenizer you are loading from 'D:/AetherGIF-V1/models/jina-clip-v2' with an incorrect regex pattern: https://huggingface.co/mistralai/Mistral-Small-3.1-24B-Instruct-2503/discussions/84#69121093e8b480e709447d5e. This will lead to incorrect tokenization. You should set the `fix_mistral_regex=True` flag when loading this tokenizer to fix this issue.
+[transformers] `torch_dtype` is deprecated! Use `dtype` instead!
+D:\AetherGIF-V1/models/jina-clip-v2\modeling_clip.py:175: UserWarning: xFormers is not installed. Check https://github.com/facebookresearch/xformers?tab=readme-ov-file#installing-xformers for installation instructions, disabling
+  warnings.warn(
+[transformers] The tokenizer you are loading from 'D:/AetherGIF-V1/models/jina-embeddings-v3' with an incorrect regex pattern: https://huggingface.co/mistralai/Mistral-Small-3.1-24B-Instruct-2503/discussions/84#69121093e8b480e709447d5e. This will lead to incorrect tokenization. You should set the `fix_mistral_regex=True` flag when loading this tokenizer to fix this issue.
+Loading weights:   0%|          | 0/999 [00:00<?, ?it/s]Loading weights:   8%|▊         | 77/999 [00:00<00:01, 756.63it/s]Loading weights:  15%|█▌        | 153/999 [00:00<00:01, 636.81it/s]Loading weights:  22%|██▏       | 218/999 [00:00<00:01, 577.41it/s]Loading weights:  28%|██▊       | 277/999 [00:00<00:01, 547.85it/s]Loading weights:  33%|███▎      | 333/999 [00:00<00:01, 486.82it/s]Loading weights:  38%|███▊      | 383/999 [00:00<00:01, 463.99it/s]Loading weights:  43%|████▎     | 430/999 [00:00<00:01, 461.51it/s]Loading weights:  48%|████▊     | 477/999 [00:00<00:01, 406.08it/s]Loading weights:  52%|█████▏    | 521/999 [00:01<00:01, 412.98it/s]Loading weights:  56%|█████▋    | 564/999 [00:01<00:01, 409.01it/s]Loading weights:  61%|██████    | 607/999 [00:01<00:00, 404.37it/s]Loading weights:  65%|██████▍   | 648/999 [00:01<00:00, 403.42it/s]Loading weights:  69%|██████▉   | 691/999 [00:01<00:00, 406.18it/s]Loading weights:  73%|███████▎  | 732/999 [00:01<00:00, 406.02it/s]Loading weights:  78%|███████▊  | 775/999 [00:01<00:00, 405.84it/s]Loading weights:  82%|████████▏ | 819/999 [00:01<00:00, 414.81it/s]Loading weights:  86%|████████▋ | 863/999 [00:01<00:00, 414.63it/s]Loading weights:  91%|█████████ | 911/999 [00:02<00:00, 428.93it/s]Loading weights:  96%|█████████▌| 956/999 [00:02<00:00, 426.66it/s]Loading weights: 100%|██████████| 999/999 [00:02<00:00, 449.15it/s]
+C:\Python312\Lib\site-packages\torch\nn\modules\module.py:1326: UserWarning: expandable_segments not supported on this platform (Triggered internally at C:\actions-runner\_work\pytorch\pytorch\builder\windows\pytorch\c10/cuda/CUDAAllocatorConfig.h:28.)
+  return t.to(
+[transformers] `use_return_dict` is deprecated! Use `return_dict` instead!
+[TEXT] 编码完成 (204, 1024)  耗时 1:48
+[IMG] 200/14145 (1%)  3.02 张/s  已用 1:06  预计剩余 1:16:57 RSS 2.80GB
+[IMG] 400/14145 (2%)  2.32 张/s  已用 2:52  预计剩余 1:38:33 RSS 0.06GB
+[IMG] 600/14145 (4%)  2.33 张/s  已用 4:17  预计剩余 1:36:57 RSS 0.06GB
+[IMG] 800/14145 (5%)  2.22 张/s  已用 6:00  预计剩余 1:40:15 RSS 0.07GB
+[IMG] 1000/14145 (7%)  2.24 张/s  已用 7:26  预计剩余 1:37:51 RSS 0.13GB
+[IMG] 1200/14145 (8%)  1.92 张/s  已用 10:26  预计剩余 1:52:34 RSS 0.07GB
+[IMG] 1400/14145 (9%)  1.86 张/s  已用 12:32  预计剩余 1:54:10 RSS 0.11GB
+[IMG] 1600/14145 (11%)  1.89 张/s  已用 14:06  预计剩余 1:50:33 RSS 0.12GB
+[IMG] 1800/14145 (12%)  1.95 张/s  已用 15:22  预计剩余 1:45:28 RSS 0.12GB
+[IMG] 2000/14145 (14%)  2.00 张/s  已用 16:39  预计剩余 1:41:06 RSS 0.13GB
+[IMG] 2200/14145 (15%)  2.06 张/s  已用 17:48  预计剩余 1:36:39 RSS 0.13GB
+[IMG] 2400/14145 (16%)  2.09 张/s  已用 19:08  预计剩余 1:33:41 RSS 0.13GB
+[IMG] 2600/14145 (18%)  2.12 张/s  已用 20:24  预计剩余 1:30:36 RSS 0.13GB
+[IMG] 2800/14145 (19%)  2.15 张/s  已用 21:42  预计剩余 1:27:56 RSS 0.13GB
+[IMG] 3000/14145 (21%)  2.18 张/s  已用 22:53  预计剩余 1:25:01 RSS 0.13GB
+[IMG] 3200/14145 (22%)  2.21 张/s  已用 24:07  预计剩余 1:22:31 RSS 0.13GB
+[IMG] 3400/14145 (24%)  2.24 张/s  已用 25:17  预计剩余 1:19:56 RSS 0.13GB
+[IMG] 3600/14145 (25%)  2.26 张/s  已用 26:31  预计剩余 1:17:42 RSS 0.13GB
+[IMG] 3800/14145 (26%)  2.29 张/s  已用 27:37  预计剩余 1:15:13 RSS 0.13GB
+[IMG] 4000/14145 (28%)  2.31 张/s  已用 28:49  预计剩余 1:13:06 RSS 0.13GB
+[IMG] 4200/14145 (29%)  2.34 张/s  已用 29:56  预计剩余 1:10:53 RSS 0.13GB
+[IMG] 4400/14145 (31%)  2.36 张/s  已用 31:06  预计剩余 1:08:53 RSS 0.13GB
+[IMG] 4600/14145 (32%)  2.38 张/s  已用 32:10  预计剩余 1:06:46 RSS 0.13GB
+[IMG] 4800/14145 (33%)  2.40 张/s  已用 33:19  预计剩余 1:04:52 RSS 0.14GB
+[IMG] 5000/14145 (35%)  2.43 张/s  已用 34:20  预计剩余 1:02:48 RSS 0.14GB
+[IMG] 5200/14145 (36%)  2.44 张/s  已用 35:27  预计剩余 1:00:58 RSS 0.14GB
+[IMG] 5400/14145 (38%)  2.47 张/s  已用 36:28  预计剩余 59:03 RSS 0.14GB
+[IMG] 5600/14145 (39%)  2.48 张/s  已用 37:34  预计剩余 57:19 RSS 0.14GB
+[IMG] 5800/14145 (41%)  2.51 张/s  已用 38:35  预计剩余 55:30 RSS 0.14GB
+[IMG] 6000/14145 (42%)  2.52 张/s  已用 39:41  预计剩余 53:52 RSS 0.14GB
+[IMG] 6200/14145 (43%)  2.54 张/s  已用 40:43  预计剩余 52:11 RSS 0.14GB
+[IMG] 6400/14145 (45%)  2.55 张/s  已用 41:50  预计剩余 50:38 RSS 0.14GB
+[IMG] 6600/14145 (46%)  2.56 张/s  已用 42:58  预计剩余 49:07 RSS 0.14GB
+[IMG] 6800/14145 (48%)  2.57 张/s  已用 44:10  预计剩余 47:43 RSS 0.14GB
+[IMG] 7000/14145 (49%)  2.58 张/s  已用 45:11  预计剩余 46:07 RSS 0.14GB
+[IMG] 7200/14145 (50%)  2.59 张/s  已用 46:18  预计剩余 44:40 RSS 0.14GB
+[IMG] 7400/14145 (52%)  2.60 张/s  已用 47:21  预计剩余 43:09 RSS 0.14GB
+[IMG] 7600/14145 (53%)  2.61 张/s  已用 48:27  预计剩余 41:43 RSS 0.14GB
+[IMG] 7800/14145 (55%)  2.63 张/s  已用 49:27  预计剩余 40:14 RSS 0.14GB
+[IMG] 8000/14145 (56%)  2.64 张/s  已用 50:33  预计剩余 38:50 RSS 0.14GB
+[IMG] 8200/14145 (57%)  2.65 张/s  已用 51:34  预计剩余 37:23 RSS 0.14GB
+[IMG] 8400/14145 (59%)  2.66 张/s  已用 52:40  预计剩余 36:01 RSS 0.14GB
+[IMG] 8600/14145 (60%)  2.67 张/s  已用 53:41  预计剩余 34:36 RSS 0.14GB
+[IMG] 8800/14145 (62%)  2.68 张/s  已用 54:46  预计剩余 33:16 RSS 0.14GB
+[IMG] 9000/14145 (63%)  2.69 张/s  已用 55:47  预计剩余 31:53 RSS 0.14GB
+[IMG] 9200/14145 (65%)  2.70 张/s  已用 56:53  预计剩余 30:34 RSS 0.14GB
+[IMG] 9400/14145 (66%)  2.71 张/s  已用 57:54  预计剩余 29:13 RSS 0.14GB
+[IMG] 9600/14145 (67%)  2.71 张/s  已用 59:00  预计剩余 27:56 RSS 0.14GB
+[IMG] 9800/14145 (69%)  2.72 张/s  已用 1:00:01  预计剩余 26:36 RSS 0.14GB
+[IMG] 10000/14145 (70%)  2.72 张/s  已用 1:01:09  预计剩余 25:21 RSS 0.14GB
+[IMG] 10200/14145 (72%)  2.73 张/s  已用 1:02:15  预计剩余 24:04 RSS 0.14GB
+[IMG] 10400/14145 (73%)  2.73 张/s  已用 1:03:23  预计剩余 22:49 RSS 0.14GB
+[IMG] 10600/14145 (74%)  2.74 张/s  已用 1:04:27  预计剩余 21:33 RSS 0.15GB
+[IMG] 10800/14145 (76%)  2.74 张/s  已用 1:05:35  预计剩余 20:19 RSS 0.15GB
+[IMG] 11000/14145 (77%)  2.75 张/s  已用 1:06:40  预计剩余 19:03 RSS 0.15GB
+[IMG] 11200/14145 (79%)  2.75 张/s  已用 1:07:49  预计剩余 17:50 RSS 0.15GB
+[IMG] 11400/14145 (80%)  2.76 张/s  已用 1:08:55  预计剩余 16:35 RSS 0.15GB
+[IMG] 11600/14145 (82%)  2.76 张/s  已用 1:10:04  预计剩余 15:22 RSS 0.15GB
+[IMG] 11800/14145 (83%)  2.76 张/s  已用 1:11:08  预计剩余 14:08 RSS 0.15GB
+[IMG] 12000/14145 (84%)  2.77 张/s  已用 1:12:19  预计剩余 12:55 RSS 0.15GB
+[IMG] 12200/14145 (86%)  2.77 张/s  已用 1:13:23  预计剩余 11:42 RSS 0.15GB
+[IMG] 12400/14145 (87%)  2.77 张/s  已用 1:14:32  预计剩余 10:29 RSS 0.15GB
+[IMG] 12600/14145 (89%)  2.78 张/s  已用 1:15:35  预计剩余 9:16 RSS 0.15GB
+[IMG] 12800/14145 (90%)  2.78 张/s  已用 1:16:45  预计剩余 8:03 RSS 0.15GB
+[IMG] 13000/14145 (91%)  2.79 张/s  已用 1:17:47  预计剩余 6:51 RSS 0.15GB
+[IMG] 13200/14145 (93%)  2.79 张/s  已用 1:18:57  预计剩余 5:39 RSS 0.15GB
+[IMG] 13400/14145 (94%)  2.79 张/s  已用 1:19:59  预计剩余 4:26 RSS 0.15GB
+[IMG] 13600/14145 (96%)  2.79 张/s  已用 1:21:09  预计剩余 3:15 RSS 0.15GB
+[IMG] 13800/14145 (97%)  2.80 张/s  已用 1:22:12  预计剩余 2:03 RSS 0.16GB
+[IMG] 14000/14145 (98%)  2.80 张/s  已用 1:23:21  预计剩余 0:51 RSS 0.16GB
+[IMG] 编码完成 成功 14145/14145  耗时 1:24:08
+[CENTER] 去均值后相似度统计（均值/std/最小/最大）
+[CENTER]   text  -0.005 / 0.160 / -0.379 / +1.000
+[CENTER]   image +0.047 / 0.488 / -0.822 / +1.000
+[SAVE] text_emb.npy  (204, 1024)
+[SAVE] image_emb.npy (14145, 1024)
+[SAVE] 目录 D:\AetherGIF-V1\docx\实验记录\versions\v4200_多模态CLIP产品版\data\clip_cache
+[DONE] 全流程耗时 1:24:13

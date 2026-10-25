@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AetherGIF v3600 · 科普卡片</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#05070E;color:#EDF3FF;font-family:'Inter','HarmonyOS Sans SC','PingFang SC','Microsoft YaHei',system-ui,sans-serif;padding:56px 40px 90px}
+h1{font-size:40px;font-weight:800;letter-spacing:-1px;margin:0 0 8px}
+.sub{color:#8E9CBC;font-size:17px;margin:0 0 44px;line-height:1.7}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(560px,1fr));gap:34px}
+.c{margin:0}
+.box{aspect-ratio:16/9;border-radius:16px;overflow:hidden;border:1px solid #1E2A44;background:#04060D;
+ box-shadow:0 18px 50px rgba(0,0,0,.6);transition:transform .35s,border-color .35s,box-shadow .35s}
+.box:hover{transform:translateY(-6px) scale(1.012);border-color:#2DD4F0;box-shadow:0 24px 70px rgba(45,212,240,.16)}
+img{width:100%;height:100%;display:block}
+figcaption{margin-top:12px;color:#7C8AA8;font-size:15px}
+figcaption b{color:#2DD4F0;font-family:ui-monospace,monospace;margin-right:8px}
+</style></head><body>
+<h1>AetherGIF v3600 · 科普卡片集</h1>
+<p class="sub">18 张动态 SVG 卡片，统一 16:9。主题：用耦合振子物理替代 self-attention 的 GIF 生成实验。<br>
+方案 D · D=125 全谱编解码 · 2,022,232 可训练参数 · 2,500 步单样本过拟合。</p>
+<div class="grid">
+<figure class="c"><div class="box"><img src="cards/01_封面.svg" alt="封面 · 用物理造 GIF" loading="lazy"></div><figcaption><b>01</b> 封面 · 用物理造 GIF</figcaption></figure>
+<figure class="c"><div class="box"><img src="cards/02_研究问题.svg" alt="研究问题 · 能不能不用注意力" loading="lazy"></div><figcaption><b>02</b> 研究问题 · 能不能不用注意力</figcaption></figure>
+<figure class="c"><div class="box"><img src="cards/03_全景架构.svg" alt="全景架构 · 一帧 GIF 的旅程" loading="lazy"></div><figcaption><b>03</b> 全景架构 · 一帧 GIF 的旅程</figcaption></figure>
+<figure class="c"><div class="box"><img src="cards/04_状态空间.svg" alt="状态空间 · 幅度与相位" loading="lazy"></div><figcaption><b>04</b> 状态空间 · 幅度与相位</figcaption></figure>
+<figure class="c"><div class="box"><img src="cards/05_五块物理.svg" alt="五块物理 · 替掉 Transformer 栈" loading="lazy"></div><figcaption><b>05</b> 五块物理 · 替掉 Transformer 栈</figcaption></figure>
+<figure class="c"><div class="box"><img src="cards/06_DriftField.svg" alt="DriftField · 唯一的目标通道" loading="lazy"></div><figcaption><b>06</b> DriftField · 唯一的目标通道</figcaption></figure>
+<figure class="c"><div class="box"><img src="cards/07_Kuramoto.svg" alt="Kuramoto · 替掉 self-attention" loading="lazy"></div><figcaption><b>07</b> Kuramoto · 替掉 self-attention</figcaption></figure>
+<figure class="c"><div class="box"><img src="cards/08_StandingWaveFFN.svg" alt="StandingWaveFFN · 替掉 FFN" loading="lazy"></div><figcaption><b>08</b> StandingWaveFFN · 替掉 FFN</figcaption></figure>
+<figure class="c"><div class="box"><img src="cards/09_OU_恢复力.svg" alt="OU 恢复力 · 替掉 LayerNorm" loading="lazy"></div><figcaption><b>09</b> OU 恢复力 · 替掉 LayerNorm</figcaption></figure>
+<figure class="c"><div class="box"><img src="cards/10_TimeField.svg" alt="TimeField · 深度即物理时间" loading="lazy"></div><figcaption><b>10</b> TimeField · 深度即物理时间</figcaption></figure>
+<figure class="c"><div class="box"><img src="cards/11_编解码器.svg" alt="编解码器 · 零参数双向变换" loading="lazy"></div><figcaption><b>11</b> 编解码器 · 零参数双向变换</figcaption></figure>
+<figure class="c"><div class="box"><img src="cards/12_全谱之争.svg" alt="全谱之争 · D=64 vs D=125" loading="lazy"></div><figcaption><b>12</b> 全谱之争 · D=64 vs D=125</figcaption></figure>
+<figure class="c"><div class="box"><img src="cards/13_LED_网格伪影.svg" alt="LED 网格伪影 · 形状比数量致命" loading="lazy"></div><figcaption><b>13</b> LED 网格伪影 · 形状比数量致命</figcaption></figure>
+<figure class="c"><div class="box"><img src="cards/14_训练协议.svg" alt="训练协议 · 加权损失设计" loading="lazy"></div><figcaption><b>14</b> 训练协议 · 加权损失设计</figcaption></figure>
+<figure class="c"><div class="box"><img src="cards/15_结果.svg" alt="结果 · 数字说话" loading="lazy"></div><figcaption><b>15</b> 结果 · 数字说话</figcaption></figure>
+<figure class="c"><div class="box"><img src="cards/16_八条设计原则.svg" alt="八条设计原则" loading="lazy"></div><figcaption><b>16</b> 八条设计原则</figcaption></figure>
+<figure class="c"><div class="box"><img src="cards/17_已知局限.svg" alt="已知局限 · 诚实边界" loading="lazy"></div><figcaption><b>17</b> 已知局限 · 诚实边界</figcaption></figure>
+<figure class="c"><div class="box"><img src="cards/18_结语.svg" alt="结语 · 物理路线能走多远" loading="lazy"></div><figcaption><b>18</b> 结语 · 物理路线能走多远</figcaption></figure>
+</div></body></html>
