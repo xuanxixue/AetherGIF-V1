@@ -1,0 +1,129 @@
+# ============================================================
+# AetherGIF-V1 · GitHub 上传规则
+#
+# 背景（2026-10-25）：本地总计 47GB，GitHub 硬上限 5GB、单文件 100MB，
+# 而本项目单个 ckpt 就 88~436MB。因此大文件不上 GitHub，只上传
+# **源码 / 文档 / 实验记录文本 / 记忆目录 / 小样本素材**（约 160MB）。
+#
+# ★★ 本文件只影响「哪些文件被 git 跟踪」，绝不删除本地任何文件。
+#     完整本地清单（82,943 个文件）见 docs/仓库清单/。
+#     大文件请另外备份（HuggingFace / 移动硬盘），见 Docs/开发计划.md
+# ============================================================
+
+# ---- 大数据与训练产物（40GB+，另存）----
+data/
+data_pipeline/
+models/
+outputs/
+outputs_real/
+baseline_2500/
+mini_data/
+
+# ---- 第三方依赖与预训练权重（可重新下载）----
+deps312/
+int8_deps/
+Qwen2.5-0.5B-Instruct/
+Qwen3-VL-Embedding/
+.venv/
+env/
+venv/
+
+# ---- 权重与大二进制 ----
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.bin
+*.h5
+*.7z
+*.onnx
+*.npy
+*.npz
+
+# ---- 大媒体（保留小体积素材样本）----
+*.mp4
+*.avi
+*.mov
+*.gif
+*.png
+*.jpg
+*.jpeg
+*.webp
+
+# ---- Python 缓存 ----
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+pip-log-txt
+
+# ---- 日志（体积大且可重建）----
+*.log
+run.log
+train_real.txt
+train_cpu.log
+*_out.txt
+overfit_*.txt
+proc_mem.txt
+mem_check.txt
+disk_check.txt
+codec_test.txt
+verify_out.txt
+py_env.txt
+azure_eval_out.txt
+
+# ---- 临时目录 ----
+*.tmp
+tmp/
+temp/
+.temp/
+out/
+build/
+dist/
+train_tag/
+scripts/_libs/
+scripts/backports/
+
+# ---- 系统与 IDE ----
+.DS_Store
+Thumbs.db
+desktop.ini
+*.nostartinfo
+*.url
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# ---- 环境变量（含密钥，禁止上传）----
+.env
+.env.local
+
+# ---- 其他 ----
+nul
+**/.git
+
+# ---- 旧仓库备份（18GB，2026-10-25 迁移时改名保留，未删除）----
+.git_backup_*/
+
+# ============================================================
+# 以下为**显式允许**的目录（覆盖上面的通用规则），
+# 保证记忆目录与实验记录文本会上传
+# ============================================================
+!.workbuddy/
+!.workbuddy/**
+!Docs/
+!Docs/**
+!docx/**/*.md
+!docx/**/*.py
+!docx/**/*.json
+!docx/**/*.txt
+!docx/**/*.svg
+!docx/**/*.cmd
+
+# ---- 敏感凭据（禁止上传，本地保留）----
+scripts/github_token.txt
+*token*.txt
+*secret*.txt
+*credential*.txt
